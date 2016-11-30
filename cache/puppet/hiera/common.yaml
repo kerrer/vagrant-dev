@@ -1,0 +1,17 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "76"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  supervisord::programs:
+   'zookeeper':
+     directory: '/vagrant/search/zookeeper-3.5.0/'
+     command: '/usr/bin/java -Dzookeeper.log.dir=. -Dzookeeper.root.logger=INFO,CONSOLE -cp /vagrant/search/zookeeper-3.5.0/bin/../build/classes:/vagrant/search/zookeeper-3.5.0/bin/../build/lib/*.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/slf4j-log4j12-1.7.5.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/slf4j-api-1.7.5.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/servlet-api-2.5-20081211.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/netty-3.7.0.Final.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/log4j-1.2.16.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/jline-2.11.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/jetty-util-6.1.26.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/jetty-6.1.26.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/javacc.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/jackson-mapper-asl-1.9.11.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/jackson-core-asl-1.9.11.jar:/vagrant/search/zookeeper-3.5.0/bin/../lib/commons-cli-1.2.jar:/vagrant/search/zookeeper-3.5.0/bin/../zookeeper-3.5.0-alpha.jar:/vagrant/search/zookeeper-3.5.0/bin/../src/java/lib/*.jar:/vagrant/search/zookeeper-3.5.0/bin/../conf: -Xmx1000m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false org.apache.zookeeper.server.quorum.QuorumPeerMain /vagrant/search/zookeeper-3.5.0/bin/../conf/zoo.cfg'
+     autostart: yes
+     autorestart: 'true'
+     startsecs: 3
+     user: 'root'
+     

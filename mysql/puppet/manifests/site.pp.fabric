@@ -1,0 +1,41 @@
+node 'my1.max.com' {  
+   exec { "install_mysql":
+    command => "/vagrant/shell/mysql.sh  back-store > /var/log/install_mysql.log  2>&1",
+    path    => "/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/vagrant/bin",
+    logoutput => true,
+    timeout => 1800    
+   }
+}
+
+node 'my2.max.com' {
+    class { 'supervisord':
+       install_pip => true,    
+    } 
+    
+    class { "lamp::multi_mysql":
+       server_id=>4,
+       require => Class['supervisord']
+    }
+}
+
+node 'my3.max.com' {  
+    class { 'supervisord':
+       install_pip => true,    
+    }  
+    
+    class { "lamp::multi_mysql":
+       server_id=>8,
+       require => Class['supervisord']
+    }
+}
+
+node 'my4.max.com' {    
+    class { 'supervisord':
+       install_pip => true,    
+    }  
+    
+    class { "lamp::multi_mysql":
+       server_id=>12,
+       require => Class['supervisord']
+    }
+}

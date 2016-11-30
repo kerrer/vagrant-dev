@@ -1,0 +1,14 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "79"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  mysql_server::root_password: 'mmmm'
+  mysql_server::users:
+    - user: "max@192.168.56.%"
+      pass: "*DA4FE867945A2BA82763C7A585C03C0859FBB7B9"
+    - user: "max2@192.168.56.%"
+      pass: "*DA4FE867945A2BA82763C7A585C03C0859FBB7B9"

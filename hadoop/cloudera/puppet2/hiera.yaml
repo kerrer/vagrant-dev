@@ -1,0 +1,12 @@
+---
+:backend:
+  - yaml
+:hierarchy:
+  - "%{::hostname}"
+  - "common"
+  - "apt"
+  
+:logger: console
+
+:yaml:
+  :datadir:

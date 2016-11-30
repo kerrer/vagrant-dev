@@ -1,0 +1,22 @@
+---
+hosts::host_entries:
+ 'one.cluster':
+   ip: '192.168.0.101'
+   host_aliases:
+     - 'one'
+ 'two.cluster':
+   ip: '192.168.0.102'
+   host_aliases:
+     - 'two'
+ 'three.cluster':
+   ip: '192.168.0.103'
+   host_aliases:
+     - 'three'
+     
+apt:
+  proxy:
+    host: '172.17.0.4'
+    port: '3142'
+    https: 'false'
+    ensure: 'present'
+     

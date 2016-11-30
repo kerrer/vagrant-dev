@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#require 'vagrant-vmware-workstation'
+puts ENV
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+  vpn.vm.network :private_network, ip: "192.168.5.55"
+
+  # r10k plugin to deploy puppet modules
+  config.r10k.puppet_dir = "environments/production"
+  config.r10k.puppetfile_path = "environments/production/Puppetfile"
+  config.r10k.module_path = "environments/production/modules"
+
+  # Provision the machine with the appliction
+  config.vm.provision "puppet" do |puppet|
+    puppet.environment = "production"
+    puppet.environment_path  = "environments"
+  end
+end

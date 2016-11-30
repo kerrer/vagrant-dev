@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+$num_instances = 2
+$files = "/work/files/monitor"
+
+Vagrant.configure(2) do |config| 
+  (1..$num_instances).each do |i|
+     server="server#{i}"
+     hostname="my#{i}.max.com"
+     server_ip= "192.168.56.4#{i}"
+     config.vm.define "#{server}" do |server|     
+       server.vm.hostname = hostname
+       server.vm.network "private_network", ip: server_ip
+     end
+  end
+ 
+  config.vm.provider "virtualbox" do |vb|
+     #    vb.name = "index-search"
+     #   vb.gui = true
+      vb.memory = "2048"
+      vb.cpus = 2
+  end
+  
+  config.vm.box = "max/ubuntu1404"
+  config.vm.synced_folder "./puppet/hiera", "/var/lib/hiera"
+  config.vm.synced_folder "./puppet/facter", "/etc/facter"
+  config.vm.synced_folder $files, "/job"
+
+  config.vm.provision "shell", path: "./shell/base.sh"
+  config.vm.provision :puppet do |puppet|
+        puppet.manifests_path = "puppet/manifests"
+        puppet.manifest_file  = "site.pp"
+        puppet.module_path = "/work/puppet-modules/modules"
+        puppet.hiera_config_path = "puppet/hiera.yaml"
+        #puppet.working_directory = "/tmp/vagrant-puppet-3"
+        #puppet.facter = {
+        #      "use_debug" => "true"
+        #}
+        puppet.options = "--verbose --debug "        
+     
+  end
+  
+end

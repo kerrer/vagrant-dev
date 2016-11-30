@@ -1,0 +1,7 @@
+fixtures:
+  repositories:
+    stdlib: "https://github.com/puppetlabs/puppetlabs-stdlib"
+    alternatives: "https://github.com/puppet-community/puppet-alternatives"
+    hadoop_lib: "https://github.com/valtri/cesnet-hadoop_lib"
+  symlinks:
+    zookeeper: "#{source_dir}"

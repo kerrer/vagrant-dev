@@ -1,0 +1,29 @@
+node 'my1.max.com' {  
+   class { "lamp::mysql::mysql_cluster":
+     node => "mgm"
+   } 
+   
+}
+
+node 'my2.max.com' {  
+    class { "lamp::mysql::mysql_cluster":
+     node => "data"
+   } 
+   
+}
+node 'my3.max.com' {
+    class { "lamp::mysql::mysql_cluster":
+     node => "data"
+   }
+}
+node 'my4.max.com' {  
+   class { "lamp::mysql::mysql_cluster":
+     node => "sql"
+   } 
+}
+node 'my5.max.com' {    
+    class { "lamp::mysql::mysql_cluster":
+     node => "sql"
+   }
+}
+

@@ -1,0 +1,70 @@
+node 'in1.max.com' {
+  include apt
+  class { 'jdk_oracle': }
+
+  package {['zip','unzip']:
+    ensure => "installed"
+  }
+  package {['mysql-client', 'unixodbc', 'libpq5']:
+    ensure => "installed"
+  }  
+
+  package {['libexpat1-dev', 'libmysqlclient-dev', 'libxml2-dev']:
+    ensure => "installed"
+  }
+#apt::ppa { 'ppa:builds/sphinxsearch-rel22':
+# before  => Package['sphinxsearch'],
+#}
+
+#package {"sphinxsearch":
+#   ensure => "installed",
+#   before => Service['sphinxsearch']
+#}
+
+#service {"sphinxsearch":
+#  ensure => "running",
+#}
+
+class {"lamp::php_cli":}
+->
+class {"lamp::apache2_php5":}
+
+exec { "init_zookeeper":
+    command => "/vagrant/shell/zookeeper.sh 1",
+    path    => "/usr/local/bin/:/bin/", 
+    before => Class['supervisord']  
+}
+
+class { 'supervisord':
+  install_pip => true
+}
+
+
+}
+
+node 'in2.max.com' {
+    class { 'jdk_oracle': }
+
+    exec { "init_zookeeper":
+       command => "/vagrant/shell/zookeeper.sh 2",
+       path    => "/usr/local/bin/:/bin/", 
+       before => Class['supervisord']  
+   }
+
+   class { 'supervisord':
+      install_pip => true
+   }
+}
+
+node 'in3.max.com' {
+    class { 'jdk_oracle': }
+    exec { "init_zookeeper":
+    command => "/vagrant/shell/zookeeper.sh 3",
+    path    => "/usr/local/bin/:/bin/", 
+    before => Class['supervisord']  
+}
+
+class { 'supervisord':
+  install_pip => true
+}
+}

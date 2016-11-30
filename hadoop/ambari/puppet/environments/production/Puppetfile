@@ -1,0 +1,11 @@
+forge "https://forge.puppetlabs.com"
+
+mod 'puppetlabs-ntp'    
+mod 'thias-tuned'
+mod 'puppetlabs-firewall', '1.8.1'
+mod 'alexharvey-disable_transparent_hugepage'
+mod 'unibet-ambari'
+mod 'puppetlabs-mysql', '3.10.0'
+mod 'cesnet-zookeeper',
+  :git => "https://github.com/MetaCenterCloudPuppet/cesnet-zookeeper.git"
+

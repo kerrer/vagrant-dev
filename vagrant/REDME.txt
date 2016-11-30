@@ -1,0 +1,10 @@
+apache2+php5+mysql-server5+phpmyadmin
+
+plugins:
+  - vagrant plugin install vagrant-triggers
+  - vagrant plugin install vagrant-hostsupdater
+  - vagrant plugin install vagrant-omnibus
+
+gems:
+  - gem install librarian-puppet
+  - gem install librarian-chef

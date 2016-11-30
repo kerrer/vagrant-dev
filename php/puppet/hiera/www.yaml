@@ -1,0 +1,21 @@
+---
+  doc_root: /job
+  hosts:
+   - host: tfc.max.com
+     doc:  tfc.max.com
+   - host: zj.max.com
+     doc:  zj.max.com 
+   - host: makuto.max.com
+     doc:  makuto.max.com
+   - host: jm.max.com
+     doc:  jm.max.com 
+   - host: dp.max.com
+     doc:  dp.max.com 
+   - host: dp7.max.com
+     doc:  dp7.max.com 
+   - host: gl.max.com
+     doc:  gl.max.com 
+   - host: xray.max.com
+     doc:  xray.max.com 
+   - host: zwz.max.com
+     doc:  zwz.max.com 

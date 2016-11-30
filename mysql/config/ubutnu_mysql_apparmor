@@ -1,0 +1,9 @@
+/var/lib/mysql-a/ r,
+/var/lib/mysql-a/** rwk,
+/var/lib/mysql-a/mysql/plugin r,
+/var/lib/mysql-a/mysql/plugin/*.so* mr,
+
+/var/lib/mysql-b/ r,
+/var/lib/mysql-b/** rwk,
+/var/lib/mysql-b/mysql/plugin r,
+/var/lib/mysql-b/mysql/plugin/*.so* mr,

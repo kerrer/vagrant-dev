@@ -1,0 +1,22 @@
+---
+- name: node1
+  box: ubuntu/trusty64
+  ram: 512
+  vcpu: 2
+  priv_ip: 192.168.56.101
+- name: node2
+  box: ubuntu/trusty64
+  ram: 512
+  vcpu: 2
+  priv_ip: 192.168.56.102
+- name: node3
+  box: ubuntu/trusty64
+  ram: 512
+  vcpu: 4
+  priv_ip: 192.168.56.103
+- name: node4
+  box: ubuntu/trusty64
+  ram: 512
+  vcpu: 1
+  priv_ip: 192.168.56.104
+  enable: 1

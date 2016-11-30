@@ -1,0 +1,30 @@
+hbase:
+
+1. 配置完成的Hadoop集群
+   bin/hdfs  dfs -mkdir /hbase
+2.3.设置hadoop账户的ssh信任关系
+2>  单独安装的ZooKeeper集群，不基于HBase集群管理
+
+3>  安装配置Hbase集群 
+   #vim hbase-0.94.5/conf/hbase-env.sh 
+    #vim hbase-0.94.5/conf/hbase-site.xml
+   #vim hbase-0.94.5/conf/regionservers
+   使HBase的lib中的hadoop版本和HDFS集群使用的版本一致
+   #rm hbase-0.94.5/lib/hadoop-*.tar
+   #cp hadoop-0.20.2/hadoop-0.20.2-*.tar  hbase-0.94.5/lib/
+
+   e>  将配置好的hbase-0.94.5复制到其他机器
+              #scp -r hbase-0.94.5  root@master01:/root/
+              #scp -r hbase-0.94.5  root@master02:/root/
+              #scp -r hbase-0.94.5  root@slave01:/root/
+4>  启动HBase集群[仅在master上]
+       a>  确保HDFS和Zookeeper已经启动
+       b>  在master01上执行
+              #./hbase-0.94.5/bin/start-hbase.sh
+5>  查看master和slave上启动的进程  www.2cto.com  
+       a>  在master01上执行
+              #jps
+       b>  在slave01上执行
+               #jps
+6> 验证Hbase集群是否安装成功
+      #./hbase-0.94.5/bin/hbase shell

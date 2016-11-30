@@ -1,0 +1,106 @@
+$slaves = ['host1','host2','host3']
+$hadoop_version = '2.7.1'
+$spark_version = '1.4.0-bin-hadoop2.6'
+$hbase_version = '1.1.1'
+$zookeeper_version = '3.5.0-alpha'
+$scala_version = '2.11.7'
+$kafka_version= '2.11-0.8.2.1'
+
+node 'my1.max.com' {  
+   class { 'jdk_oracle': }
+   class {'lamp::cluster::ssh': }
+
+   class {'lamp::cluster::hadoop::hdfs': 
+      version => $hadoop_version,
+      slaves => $slaves
+   }   
+   class {'lamp::cluster::hbase': 
+      version => $hbase_version,
+      slaves => $slaves
+   }
+}
+
+
+node 'my2.max.com' {  
+   class { 'jdk_oracle': }
+   class {'lamp::cluster::ssh': }
+
+   class {'lamp::language::scala':
+     version => $scala_version
+   }
+   ->
+   class {'lamp::cluster::kafka':
+       server_id => 1,
+       version => $kafka_version,
+       slaves => $slaves,
+       before => Class['supervisord'] 
+   }
+
+
+   class {'lamp::cluster::hadoop::hdfs': 
+      version => $hadoop_version,
+      slaves => $slaves
+   }
+   class {'lamp::cluster::hbase': 
+      version => $hbase_version,
+      slaves => $slaves,
+   }
+
+   class {'lamp::cluster::zookeeper': 
+      server_id => 1,
+      version => $zookeeper_version,
+      slaves => $slaves,
+      before => Class['supervisord'] 
+   }
+   class { 'supervisord':
+    install_pip => true
+   }
+}
+
+node 'my3.max.com' {  
+   class { 'jdk_oracle': }
+   class {'lamp::cluster::ssh': }
+
+   class {'lamp::cluster::hadoop::hdfs': 
+      version => $hadoop_version,
+      slaves => $slaves,
+   }
+   class {'lamp::cluster::hbase': 
+      version => $hbase_version,
+      slaves => $slaves,
+   }
+   
+   class {'lamp::cluster::zookeeper': 
+      server_id => 2,
+      version => $zookeeper_version,
+      slaves => $slaves,
+      before => Class['supervisord'] 
+   }
+   class { 'supervisord':
+     install_pip => true
+   }
+
+}
+node 'my4.max.com' {  
+   class { 'jdk_oracle': }
+   class {'lamp::cluster::ssh': }
+
+   class {'lamp::cluster::hadoop::hdfs': 
+      version => $hadoop_version,
+      slaves => $slaves
+   }
+   class {'lamp::cluster::hbase': 
+      version => $hbase_version,
+      slaves => $slaves,
+   }
+   
+   class {'lamp::cluster::zookeeper': 
+      server_id => 3,
+      version => $zookeeper_version,
+      slaves => $slaves,
+      before => Class['supervisord'] 
+   }
+   class { 'supervisord':
+     install_pip => true
+   }
+}

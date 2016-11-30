@@ -1,0 +1,3 @@
+puppet/modules
+**/*.tar.gz
+.vagrant

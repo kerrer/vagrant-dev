@@ -1,0 +1,26 @@
+  HADOOP_PREFIX=/vagrant/hadoop-2.7.0
+  export HADOOP_PREFIX
+  HADOOP_CONF_DIR=/vagrant/hadoop-2.7.0/etc/hadoop1
+  export HADOOP_CONF_DIR
+  
+  [hdfs]$ $HADOOP_PREFIX/bin/hdfs namenode -format <cluster_name>
+  [hdfs]$ $HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs start namenode
+  [hdfs]$ $HADOOP_PREFIX/sbin/hadoop-daemons.sh --config $HADOOP_CONF_DIR --script hdfs start datanode
+  [hdfs]$ $HADOOP_PREFIX/sbin/start-dfs.sh
+  [yarn]$ $HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR start nodemanager
+  [yarn]$ $HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR start proxyserver
+  [yarn]$ $HADOOP_PREFIX/sbin/start-yarn.sh
+  [mapred]$ $HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh --config $HADOOP_CONF_DIR start historyserver
+  
+  [hdfs]$ $HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs stop namenode
+  [hdfs]$ $HADOOP_PREFIX/sbin/hadoop-daemons.sh --config $HADOOP_CONF_DIR --script hdfs stop datanode
+  [hdfs]$ $HADOOP_PREFIX/sbin/stop-dfs.sh
+  [yarn]$ $HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR stop resourcemanager
+  [yarn]$ $HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR stop nodemanager
+  [yarn]$ $HADOOP_PREFIX/sbin/stop-yarn.sh
+  [yarn]$ $HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR stop proxyserver
+  [mapred]$ $HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh --config $HADOOP_CONF_DIR stop historyserver
+  
+  NameNode	http://nn_host:port/	Default HTTP port is 50070.          http://192.168.56.41:50070/
+  ResourceManager	http://rm_host:port/	Default HTTP port is 8088.   http://192.168.56.41:8088/
+  MapReduce JobHistory Server	http://jhs_host:port/	Default HTTP port is 19888. http://192.168.56.41:19888/

@@ -1,0 +1,56 @@
+#sudo dpkg -i mysql-apt-config_0.3.5-1ubuntu14.04_all.deb
+
+Ha:
+mysqlfabric manage  setup
+mysqlfabric manage start
+mysqlfabric group create my_group
+mysqlfabric group add my_group 192.168.56.42:3306
+mysqlfabric group add my_group 192.168.56.43:3306
+mysqlfabric group add my_group 192.168.56.44:3306
+mysqlfabric group lookup_servers my_group
+mysqlfabric group promote my_group
+mysqlfabric group activate my_group
+
+
+Sharing:
+1. mysqlfabric manage  setup
+mysqlfabric manage start
+2. 添加3个Fabric分组的成员实例,我们在每个分组中添加了2个成员，以避免单点故障
+mysqlfabric group create Sharding-grp-1
+mysqlfabric group create Sharding-grp-2
+mysqlfabric group create Sharding-grp-global
+
+mysqlfabric group add Sharding-grp-1 192.168.56.42:3307
+mysqlfabric group add Sharding-grp-1 192.168.56.42:3308
+
+mysqlfabric group add Sharding-grp-2 192.168.56.43:3307
+mysqlfabric group add Sharding-grp-2 192.168.56.43:3308
+
+mysqlfabric group add Sharding-grp-global 192.168.56.44:3307
+mysqlfabric group add Sharding-grp-global 192.168.56.44:3308
+
+3.在这3个分组中选举PRIMARY角色,这一步，我们让3个分组中都有一个PRIMARY角色
+ mysqlfabric group promote Sharding-grp-global
+ mysqlfabric group promote Sharding-grp-1
+ mysqlfabric group promote Sharding-grp-2
+4.定义分片策略,我们定义了一个range类型的分片策略，当然还有list, hash类型的分片键可以定义。
+mysqlfabric sharding create_definition RANGE Sharding-grp-global
+
+六、添加要分片的表及字段,这一步，我们定义了要分片的是testdb数据库中的students表的stu_no字段
+ mysqlfabric sharding add_table 1 testdb.students stu_no
+
+七、给表添加分片信息.这一步，我们将表testdb.students的数据分到了2个sharding实例上，其中stu_no在1~999的数据是放在Sharding-grp-1分组中，即5902和5903中；stu_no在1000以上的数据是放在Sharding-grp-2分组中，即5904和5905中。我们将在下一步来验分片的工作情况
+
+ mysqlfabric sharding add_shard 1 "Sharding-grp-1/1, Sharding-grp-2/1000" --state=ENABLED
+
+八、验证Sharding工作情况
+  这一步，我们测试当stu_no=1时，这条记录是被分到了5902中，也就是Sharding-grp-1分组中；当stu_no=1000时，这条记录是被分到了5905中，也就是Sharding-grp-2分组中。以上的测试说明sharding环境已经搭建部署完毕
+
+ mysqlfabric sharding lookup_servers testdb.students 1
+mysqlfabric sharding lookup_servers testdb.students 1000
+
+九、关于API接口及用户期望
+
+目前Fabric提供了Php, Java, Python三大类的API，大家可以通过编程的方式来操作Fabric。目前这个版本来说也有一定的不足，就是对于习惯了命令行操作方式的DBA来说，Fabric还没有提供一个CLI的访问方式，所以作者更期望Fabric能为非程序开发人员提供合适的CLI接口。
+
+10.

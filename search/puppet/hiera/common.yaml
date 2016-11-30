@@ -1,0 +1,18 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "76"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  supervisord::programs:
+   supervisord::programs:
+   'zookeeper':
+     directory: '/zookeeper/install'
+     command: '/zookeeper/install/bin/zkServer.sh start-foreground'
+     autostart: yes
+     autorestart: 'true'
+     stopsignal: 'KILL'
+     user: 'root'
+     

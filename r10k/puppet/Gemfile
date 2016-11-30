@@ -1,0 +1,5 @@
+source "https://gems.ruby-china.org/"
+# gem "rails"
+gem 'r10k'
+gem 'puppet'
+

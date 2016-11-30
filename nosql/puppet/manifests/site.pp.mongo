@@ -1,0 +1,28 @@
+#mongodb
+#auth: TFC <maxkerrer@126.com>
+#2015-07-31
+
+$mongodb="3.0.5"
+$nodes=['192.168.56.41','192.168.56.42','192.168.56.43']
+node 'my1.max.com' {  
+   class { "lamp::cluster::mongo":
+     version => $mongodb,
+     nodes=>$nodes
+   } 
+   
+}
+
+node 'my2.max.com' {  
+   class { "lamp::cluster::mongo":
+    version => $mongodb,
+     nodes=>$nodes
+   } 
+   
+}
+node 'my3.max.com' {
+    class { "lamp::cluster::mongo":
+     version => $mongodb,
+     nodes=>$nodes
+   } 
+}
+

@@ -1,0 +1,154 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+$num_instances = 1
+$files = "/work/files/max"
+vagrant_dir = File.expand_path(File.dirname(__FILE__))
+$factor={"role" => "database",  "environment"=>"development"}
+
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+  
+  (1..$num_instances).each do |i|
+     server="server#{i}"
+     hostname="my#{i}.max.com"
+     server_ip= "192.168.56.9#{i}"
+     config.vm.define "#{server}" do |server|     
+       server.vm.hostname = hostname
+       server.vm.network "private_network", ip: server_ip
+     end
+  end
+  
+  if defined?(VagrantPlugins::HostsUpdater)
+    # Recursively fetch the paths to all vvv-hosts files under the www/ directory.
+    paths = Dir[File.join(vagrant_dir, 'config', 'www-hosts')]
+    # Parse the found vvv-hosts files for host names.
+    hosts = paths.map do |path|
+      # Read line from file and remove line breaks
+      lines = File.readlines(path).map(&:chomp)
+      # Filter out comments starting with "#"
+      lines.grep(/\A[^#]/)
+    end.flatten.uniq # Remove duplicate entries
+    # Pass the found host names to the hostsupdater plugin so it can perform magic.
+    config.hostsupdater.aliases = hosts
+    config.hostsupdater.remove_on_suspend = true
+  end
+  
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  
+  config.vm.box = "max/ubuntu14"
+  
+  #config.vm.hostname = "media"
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  
+  
+  # config.vm.network "private_network", ip: "192.168.56.16"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+   #config.vm.network "public_network",ip: "192.168.1.254"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.   
+    
+    config.vm.synced_folder "./puppet/hiera", "/tmp/vagrant-puppet/hiera"
+    config.vm.synced_folder "./puppet/facter", "/tmp/vagrant-puppet/facter"
+    
+    config.vm.synced_folder $files, "/job",:mount_options => ['dmode=777,fmode=777']
+	
+	config.vm.synced_folder "database/", "/srv/database"
+	
+	if File.exists?(File.join(vagrant_dir,'database/data/mysql_upgrade_info')) then
+		config.vm.synced_folder "database/data/", "/var/lib/mysql", :mount_options => [ "dmode=777", "fmode=777" ]
+	end
+	
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+   config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.name = "media-server"
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+      vb.memory = "1024"
+      vb.cpus = 2
+   end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline <<-SHELL
+  #   sudo apt-get install apache2
+  
+  # SHELL
+	config.vm.provision "shell", path: "./shell/base.sh"
+	
+	
+	#config.vm.provision :shell, :inline => "test -d /etc/puppet/modules/rvm || puppet module install maestrodev/rvm"
+	#config.vm.provision :shell, path: "vagrant_tools/remove_puppet_unless_modern.sh"  # in case the VM has old crap installed...
+	#config.vm.provision :shell, path: "vagrant_tools/install_puppet_on_ubuntu.sh"
+
+   config.vm.provision :puppet do |puppet|
+        puppet.manifests_path = "puppet/manifests"
+        puppet.manifest_file  = "site.pp"
+        #puppet.module_path = "puppet/modules"
+        puppet.module_path = "/work/puppet/modules"
+        puppet.hiera_config_path = "puppet/hiera/hiera.yaml"
+        puppet.facter = $factor
+        puppet.working_directory = "/tmp/vagrant-puppet/"
+        puppet.options = "--parser future --verbose --debug "        
+     
+  end
+  #config.vm.provision "shell" do |s|
+  #  s.path = "./shell/drush.sh"
+  #end
+  
+  config.vm.provision "shell", path: "./shell/post.sh"
+  
+   if defined? VagrantPlugins::Triggers
+    config.trigger.before :halt, :stdout => true do
+      run "vagrant ssh -c 'vagrant_halt'"
+    end
+    config.trigger.before :suspend, :stdout => true do
+      run "vagrant ssh -c 'vagrant_suspend'"
+    end
+    config.trigger.before :destroy, :stdout => true do
+      puts Vagrant.inspect
+     run "vagrant ssh -c 'vagrant_destroy'"
+    end
+  end
+end

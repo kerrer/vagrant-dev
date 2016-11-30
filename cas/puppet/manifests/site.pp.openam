@@ -1,0 +1,102 @@
+#$jdk_pacakge    = hiera('jdk_oracle::package')
+#file {"/usr/local/java":
+#    ensure=>"directory"
+#}
+#file {"copy jdk package":
+#   path => "/usr/local/java/${jdk_pacakge}",
+#   source => "/vagrant/${jdk_pacakge}",
+#}
+node 'my1.max.com' {
+   include hosts
+
+   class { 'jdk_oracle': 
+     cache_source => "/job/"
+   }
+  lamp::auth::openam {"openam.max.com":
+      war  => "openam.war",
+      source_war => "/job/openam/OpenAM-12.0.0.war"
+   }
+}
+
+node 'my2.max.com' {
+  class { 'jdk_oracle': 
+     cache_source => "/job/"
+   }
+  class {"lamp::auth::opendj":
+    version => "2.6.0"
+  }
+
+  class {"lamp::auth::openidm":
+    version => "3.1.0"
+  }
+}
+
+node 'my3.max.com' {
+   include hosts
+     class { 'jdk_oracle': 
+     cache_source => "/job/"
+   }
+   
+   class {"lamp::php_cli":}
+   ->
+   class {"lamp::apache2::php5":}
+  # ->
+  # file_line { 'sudo_rule':
+  #     path => '/etc/apache2/apache2.conf',
+  #     line => 'include /apache24_agent/Agent_001/config/dsame.conf',
+  #     require => File['/apache24_agent'],
+  # }
+  
+  file { '/apache24_agent':      
+      ensure => "directory",
+      recurse => true,
+      source => "/job/apache24_agent",
+      replace => false,
+  }
+ file { '/tomcat_v6_agent':      
+      ensure => "directory",
+      recurse => true,
+      source => "/job/tomcat_v6_agent",
+      replace => false,
+  }
+
+  file {'/tmp/pwd.txt':
+     ensure => "file",
+     content => "mmmm"
+  }
+
+   $TOMCAT7_HOME="/opt/apache-tomcat/tomcat7"
+  class { 'tomcat': }
+  tomcat::instance { 'tomcat7':
+		catalina_base => $TOMCAT7_HOME,
+		source_url  => '/job/apache-tomcat-7.0.63.tar.gz'
+  }->
+  tomcat::war { 'sample.war':     	
+		catalina_base  => $TOMCAT7_HOME,
+		war_source => '/job/sample.war',
+  }
+  lamp::tomcat::initd {"Tomcat7":
+	   catalina_base=>$TOMCAT7_HOME
+  }->
+  tomcat::service { 'default': 
+		catalina_base => $TOMCAT7_HOME,
+		service_ensure => 'running',
+		service_name =>"Tomcat7",
+		service_enable => true,
+		use_init => true,
+		use_jsvc => false,
+  }
+  
+}
+
+node 'my4.max.com' {
+   include hosts
+
+   class { 'jdk_oracle': 
+     cache_source => "/job/"
+   }
+   lamp::auth::openam {"dmz.am.max.com":
+      war  => "das.war",
+      source_war => "/job/openam/OpenAM-DistAuth-12.0.0.war"
+   }
+}

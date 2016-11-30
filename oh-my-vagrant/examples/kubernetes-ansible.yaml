@@ -1,0 +1,55 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: fedora-21
+:cpus: ''
+:memory: ''
+:disks: 0
+:disksize: 40G
+:boxurlprefix: ''
+:sync: rsync
+:syncdir: ''
+:syncsrc: ''
+:folder: ''
+:extern:
+- type: git
+  system: ansible
+  repository: https://github.com/eparis/kubernetes-ansible
+  directory: kubernetes
+:cd: ''
+:puppet: false
+:classes: []
+:shell: []
+:docker: false
+:kubernetes: false
+:ansible:
+- kubernetes/setup.yml
+:playbook: []
+:ansible_extras: {}
+:cachier: false
+:vms:
+- :name: master1
+  :ansible:
+  - masters
+  - etcd
+  :playbook:
+  - kubernetes/setup.yml
+- :name: minion1
+  :ansible:
+  - minions
+- :name: minion2
+  :ansible:
+  - minions
+:namespace: omv
+:count: 0
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:reboot: false
+:unsafe: false
+:nested: false
+:tests: []
+:comment: ''
+:reallyrm: false

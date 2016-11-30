@@ -1,0 +1,2 @@
+
+class { 'jdk_oracle': }

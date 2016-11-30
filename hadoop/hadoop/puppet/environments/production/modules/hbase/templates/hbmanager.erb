@@ -1,0 +1,67 @@
+<%
+  zk = scope.lookupvar('hbase::daemons')['zookeeper']
+  m = scope.lookupvar('hbase::daemons')['master']
+  rs = scope.lookupvar('hbase::daemons')['regionserver']
+  rests = scope.lookupvar('hbase::daemons')['restserver']
+  ts = scope.lookupvar('hbase::daemons')['thriftserver']
+-%>
+#! /bin/sh
+
+#
+# Helper script for checking and changing status of all HBAse daemons
+# relevant for this node.
+#
+
+if [ -z "$1" ]; then
+	echo "Usage: $0 start|stop|status|..."
+	echo "       $0 clean"
+	exit 1
+fi
+
+while [ -n "$1" ]; do
+
+	case "$1" in
+	clean)
+		rm -rfv /var/log/hbase-*/* 2>/dev/null || :
+		rm -rfv /var/log/hbase/* 2>/dev/null || :
+		;;
+	start|restart|*)
+<%if scope.lookupvar('hbase::zookeeper_hostnames').include? @fqdn and not scope.lookupvar('hbase::external_zookeeper') -%>
+		echo "<%= zk -%> $1"; service <%= zk -%> $1
+<%end-%>
+<%if scope.lookupvar('hbase::master_hostname') == @fqdn or (@backup_hostnames and @backup_hostnames.include? @fqdn) -%>
+		echo "<%= m -%> $1"; service <%= m -%> $1
+<%end-%>
+<%if @slaves and @slaves.include? @fqdn -%>
+		echo "<%= rs -%> $1"; service <%= rs -%> $1&
+<%end-%>
+<%if @rest_hostnames and @rest_hostnames.include? @fqdn -%>
+		echo "<%= rests -%> $1"; service <%= rests -%> $1&
+<%end-%>
+<%if @thrift_hostnames and @thrift_hostnames.include? @fqdn -%>
+		echo "<%= ts -%> $1"; service <%= ts -%> $1&
+<%end-%>
+		wait
+		;;
+	stop)
+<%if @slaves and @slaves.include? @fqdn -%>
+		echo "<%= rs -%> $1"; service <%= rs -%> $1&
+<%end-%>
+<%if @rest_hostnames and @rest_hostnames.include? @fqdn -%>
+		echo "<%= rests -%> $1"; service <%= rests -%> $1&
+<%end-%>
+<%if @thrift_hostnames and @thrift_hostnames.include? @fqdn -%>
+		echo "<%= ts -%> $1"; service <%= ts -%> $1&
+<%end-%>
+		wait
+<%if scope.lookupvar('hbase::master_hostname') == @fqdn or (@backup_hostnames and @backup_hostnames.include? @fqdn) -%>
+		echo "<%= m -%> $1"; service <%= m -%> $1
+<%end-%>
+<%if scope.lookupvar('hbase::zookeeper_hostnames').include? @fqdn and not scope.lookupvar('hbase::external_zookeeper') -%>
+		echo "<%= zk -%> $1"; service <%= zk -%> $1
+<%end-%>
+		;;
+	esac
+
+	shift
+done

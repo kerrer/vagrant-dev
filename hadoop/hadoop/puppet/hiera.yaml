@@ -1,0 +1,11 @@
+---
+:backend:
+  - yaml
+:hierarchy:
+  - "nodes/%{::fqdn}"
+  - "common"
+  
+:logger: console
+
+:yaml:
+  :datadir: "/etc/puppetlabs/puppet/environments/%{environment}/hieradata"

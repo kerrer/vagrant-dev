@@ -1,0 +1,1 @@
+bin/nodetool -host 192.168.0.10 -p 7199 status

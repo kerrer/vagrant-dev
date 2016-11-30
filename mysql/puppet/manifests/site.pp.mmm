@@ -1,0 +1,81 @@
+node 'my1.max.com' {  
+   
+   $override_options = {
+     'mysqld' => {
+        'server-id' => 1,
+        'expire-logs-days' => 15
+     }
+   }
+
+   $users= {
+      'replicator@192.168.56.42' => {
+        ensure                   => 'present',
+        password_hash            => '*DA4FE867945A2BA82763C7A585C03C0859FBB7B9',
+      },
+   }
+
+  $grants = {
+      'replicator@192.168.56.42/*.*' => {
+        ensure     => 'present',
+        options    => ['GRANT'],
+        privileges => ['REPLICATION SLAVE'],
+        table      => '*.*',
+        user       => 'replicator@192.168.56.42',
+      },
+  }
+
+  class { '::mysql::server':
+     root_password           => 'mmmm',
+     remove_default_accounts => true,
+     override_options        => $override_options,
+     users => $users,
+     grants => $grants
+  } 
+}
+
+
+node 'my2.max.com' {
+   $override_options = {
+     'mysqld' => {
+        'server-id' => 2,
+        'expire-logs-days' => 15
+     }
+   }
+
+   $users= {
+      'replicator@192.168.56.42' => {
+        ensure                   => 'present',
+        password_hash            => '*DA4FE867945A2BA82763C7A585C03C0859FBB7B9',
+      },
+   }
+
+  $grants = {
+      'replicator@192.168.56.42/*.*' => {
+        ensure     => 'present',
+        options    => ['GRANT'],
+        privileges => ['REPLICATION SLAVE'],
+        table      => '*.*',
+        user       => 'replicator@192.168.56.43',
+      },
+  }
+
+  class { '::mysql::server':
+     root_password           => 'mmmm',
+     remove_default_accounts => true,
+     override_options        => $override_options,
+     users => $users,
+     grants => $grants
+  } 
+}
+node 'my3.max.com' {  
+   class { '::mysql::server':
+     root_password           => 'mmmm',
+     remove_default_accounts => true,
+  }
+}
+node 'my4.max.com' {    
+  class { '::mysql::server':
+     root_password           => 'mmmm',
+     remove_default_accounts => true,
+  }
+}

@@ -1,0 +1,4 @@
+use_debug=true
+apache_root=/vagrant_data/public
+mysql_root_password=mmmm
+hosts=sf.max.com:sf.max.com,yx.max.com:yx.max.com,in.max.com:in.max.com,zf.max.com:WS_WAP_PAYWAP-PHP-UTF-8,cm.max.com:common.yx129.com

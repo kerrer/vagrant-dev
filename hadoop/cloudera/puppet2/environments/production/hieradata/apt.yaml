@@ -1,0 +1,7 @@
+---
+apt:
+  proxy:
+    host: '172.17.0.6'
+    port: '3142'
+    https: 'false'
+    ensure: 'present'

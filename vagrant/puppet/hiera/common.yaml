@@ -1,0 +1,17 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "79"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  hosts::host_entries:
+   'auth.max.com':
+     ip: '192.168.56.41'
+     host_aliases:
+       - 'openam'
+   'yx.max.com':
+     ip: '192.168.56.43'
+   'dmz.am.max.com':
+     ip: '192.168.56.44'

@@ -1,0 +1,10 @@
+---
+  supervisord::programs:
+   'zookeeper':
+     directory: '/zookeeper/install'
+     command: '/zookeeper/install/bin/zkServer.sh start-foreground'
+     autostart: yes
+     autorestart: 'true'
+     stopsignal: 'KILL'
+     user: 'vagrant'
+

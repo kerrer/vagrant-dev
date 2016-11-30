@@ -1,0 +1,90 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+n = '192.168.56'
+
+#   Simple Architecture Diagram
+#   _________________               _________________
+#   |123.123.123.101|               |123.123.123.100|               -----------
+#   | Worker        | 123.123.123.x | ES            | :80 to :8080  |         |
+#   | -Flume        |===============| -Elasticsearch|===============| Macbook |
+#   | -Apache       |  Host Only    | -Kibana       |               |         |
+#   -----------------               -----------------                --------- 
+
+$mirrors_apt = <<SCRIPT
+apt-get install curl -y
+mv /etc/apt/sources.list /etc/apt/sources.list.backup
+curl http://mirrors.163.com/.help/sources.list.trusty -o /etc/apt/sources.list
+apt-get update
+SCRIPT
+
+$hadop_apt = <<SCRIPT
+curl http://archive.cloudera.com/cdh5/ubuntu/trusty/amd64/cdh/cloudera.list -o /etc/apt/sources.list.d/cloudera.list
+apt-get update
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+  #config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box"
+  
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope       = :box # or :machine
+    config.cache.auto_detect = false
+  end
+
+   config.vm.provision :hosts do |provisioner|
+      provisioner.autoconfigure = true
+      provisioner.sync_hosts = true
+      provisioner.add_localhost_hostnames = false
+   end
+
+  #Elasticsearch Node
+  config.vm.define "es" do |es|
+    es.vm.hostname = "es.max.com"
+    es.vm.network :private_network, ip: n + ".100"
+    es.vm.provision :shell, :inline => $mirrors_apt
+    es.vm.provision :shell, :path => "shell/es_setup.sh"
+  end
+
+  #Worker Node w/ apache and flume connected to elasticsearch
+  config.vm.define "worker" do |worker|
+    worker.vm.hostname = "worker.max.com"
+    worker.vm.network :private_network, ip: n + ".101"
+    worker.vm.provision :shell, :inline => $mirrors_apt
+    worker.vm.provision :shell, :path => "shell/worker_setup.sh"
+  end
+   
+  config.vm.define "hadoop" do |hadoop|
+    hadoop.vm.hostname = "hadoop.max.com"
+    hadoop.vm.network :private_network, ip: n + ".102"
+    hadoop.vm.provider :virtualbox do |vb|
+       vb.memory = 6024
+       vb.cpus = 4
+    end
+  end
+ 
+  #config.trigger.after  :up do
+  #  info "Dumping the database before destroying the VM..."
+  #  run_remote  $mirrors_apt
+  #end
+
+  #config.vm.provider :virtualbox do |vb|
+  #   vb.customize ["modifyvm", :id,
+  #                 "--memory", "3096",
+  #                 "--cpus", 2,
+  #                 "--natdnshostresolver1", "on",
+  #                 "--natdnsproxy1", "on"                ]
+  #end
+  
+
+  config.vm.synced_folder "puppet", "/etc/puppetlabs/puppet"
+  config.vm.provision :shell, path: "shell/base.sh"
+  config.vm.provision :puppet do |puppet|
+        puppet.environment_path = ["vm", "/etc/puppetlabs/puppet/environments"]
+        puppet.environment = "production"
+        #puppet.facter = {
+        #      "use_debug" => "true"
+        #}
+        puppet.options = "--verbose --debug "       
+  end
+end

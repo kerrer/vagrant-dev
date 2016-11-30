@@ -1,0 +1,18 @@
+---
+hosts::host_entries:
+ 'tomcatnode1.max.com':
+   ip: '192.168.56.101'
+   host_aliases:
+     - 'tomcatnode1'
+ 'tomcatnode2.max.com':
+   ip: '192.168.56.102'
+   host_aliases:
+     - 'tomcatnode2'
+ 'tomcatnode3.max.com':
+   ip: '192.168.56.103'
+   host_aliases:
+     - 'tomcatnode3'
+ 'tomcatnode4.max.com':
+   ip: '192.168.56.104'
+   host_aliases:
+     - 'tomcatnode4'

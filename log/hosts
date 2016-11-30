@@ -1,0 +1,4 @@
+#LogNodes start
+192.168.56.101 lognode1.max.com
+192.168.56.102 lognode2.max.com
+192.168.56.103 lognode3.max.com

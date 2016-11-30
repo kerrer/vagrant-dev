@@ -1,0 +1,2 @@
+chmod 0777 /etc/ssl
+/usr/local/java/jdk1.7.0_79/bin/keytool  -import http.crt|tomcat.crt

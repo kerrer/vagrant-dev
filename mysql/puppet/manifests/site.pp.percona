@@ -1,0 +1,157 @@
+node 'my1.max.com' {  
+
+   class { 'haproxy':
+   global_options   => {
+    'log'     => "127.0.0.0 local0",
+    'log'     => "127.0.0.0 local1 notice",
+   'chroot'  => '/var/lib/haproxy',
+    'pidfile' => '/var/run/haproxy.pid',
+    'maxconn' => '4000',
+    'user'    => 'haproxy',
+    'group'   => 'haproxy',
+    'daemon'  => '',
+    'stats'   => 'socket /var/lib/haproxy/stats',
+   },
+   defaults_options => {
+    'log'     => 'global',
+    'stats'   => 'enable',
+    'option'  => 'redispatch',
+    'retries' => '3',
+    'timeout' => [
+      'http-request 10s',
+      'queue 1m',
+      'connect 10s',
+      'client 1m',
+      'server 1m',
+      'check 10s',
+    ],
+    'maxconn' => '8000',
+   },
+  }
+#  haproxy::listen { 'mysql-cluster':
+#    collect_exported => false,
+#    ipaddress        => "0.0.0.0",
+#    ports            => '3306',
+#    mode             =>'tcp',
+#    options   => {
+#    'option'  => [
+#      'mysql-check user root'
+#    ],
+#    'balance' => 'roundrobin',
+#  },
+#  }
+ haproxy::balancermember { 'db01':
+    listening_service => 'pxc-back',
+    server_names      => 'db01',
+    ipaddresses       => '192.168.56.42',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3',
+ }
+  haproxy::balancermember { 'db02':
+    listening_service => 'pxc-back',
+    server_names      => 'db02',
+    ipaddresses       => '192.168.56.43',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3',
+  }
+   haproxy::balancermember { 'db03':
+    listening_service => 'pxc-back',
+    server_names      => 'db03',
+    ipaddresses       => '192.168.56.44',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3',
+  }
+  
+   haproxy::balancermember { 'db011':
+    listening_service => 'pxc-onenode-back',
+    server_names      => 'db01',
+    ipaddresses       => '192.168.56.42',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3',
+ }
+  haproxy::balancermember { 'db021':
+    listening_service => 'pxc-onenode-back',
+    server_names      => 'db02',
+    ipaddresses       => '192.168.56.43',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3 backup',
+  }
+   haproxy::balancermember { 'db031':
+    listening_service => 'pxc-onenode-back',
+    server_names      => 'db03',
+    ipaddresses       => '192.168.56.44',
+    ports             => '3306',
+    options           => 'check port 9200 inter 12000 rise 3 fall 3 backup',
+  }
+  haproxy::frontend { 'pxc-front':
+  ipaddress     => '0.0.0.0',
+  ports         => '3307',
+  mode          => 'tcp', 
+  options       => {
+    'default_backend' => 'pxc-back',
+  },
+}
+
+haproxy::frontend { 'stats-front':
+  ipaddress     => '0.0.0.0',
+  ports         => '80',
+  mode          => 'http', 
+  options       => {
+    'default_backend' => 'stats-back'
+  },
+}
+
+haproxy::frontend { 'pxc-onenode-front':
+  ipaddress     => '0.0.0.0',
+  ports         => '3306',
+  mode          => 'tcp',   
+  options       => {
+   'default_backend' => 'pxc-onenode-back'
+  },
+}
+
+haproxy::backend { 'pxc-back':
+  options => {
+    'option'  => [
+      'httpchk',     
+    ],
+    'mode' =>'tcp',
+    'balance' => 'leastconn',
+  },
+}
+haproxy::backend { 'stats-back':
+  options => {    
+    'mode' =>'http',
+    'balance' => 'roundrobin',
+    'stats uri' => '/haproxy/stats',
+    'stats auth' => 'admin:mmmm',
+  },
+}
+haproxy::backend { 'pxc-onenode-back':
+  options => {
+    'option'  => [
+      'httpchk',     
+    ],
+    'mode' =>'tcp',
+    'balance' => 'leastconn',
+  },
+}
+}
+node 'my2.max.com' {
+   class { "lamp::mysql::percona_cluster": 
+       server_id => 2 ,
+       ip        => '192.168.56.42'
+   }
+}
+node 'my3.max.com' {  
+    class { "lamp::mysql::percona_cluster": 
+       server_id => 3,
+        ip        => '192.168.56.43'
+   }
+}
+node 'my4.max.com' {    
+    class { "lamp::mysql::percona_cluster": 
+       server_id => 4,
+        ip        => '192.168.56.44'
+   }
+}

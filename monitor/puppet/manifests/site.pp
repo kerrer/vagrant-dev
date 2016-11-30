@@ -1,0 +1,27 @@
+
+node 'my1.max.com' {
+  class {'lamp::monitor::nagios::server::install':}
+  ->
+  class {'lamp::monitor::nagios::server::concat':}
+  ->
+  class {'lamp::monitor::nagios::server::config':}
+}
+
+node 'my2.max.com' {
+   class {'lamp::monitor::nagios::agent::install': }
+   ->
+   class {'lamp::monitor::nagios::agent::config': 
+     allow_hosts => '192.168.56.41'
+   }
+   ->
+   class {'lamp::monitor::nagios::agent::command': 
+      name=>'check_all_disks',
+      value=>'/usr/local/nagios/libexeccheck_disk -w 20% -c 10% -e',
+   }
+   
+}
+
+
+node 'my3.max.com' {
+
+}

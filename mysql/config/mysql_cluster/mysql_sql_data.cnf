@@ -1,0 +1,8 @@
+[mysqld]
+# Options for mysqld process:
+ndbcluster                      # run NDB storage engine
+log-error=/var/log/mysql_error.log
+
+[mysql_cluster]
+# Options for MySQL Cluster processes:
+ndb-connectstring=192.168.56.41  # location of management server

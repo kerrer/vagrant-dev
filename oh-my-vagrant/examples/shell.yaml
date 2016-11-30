@@ -1,0 +1,49 @@
+---
+:domain: example.com
+:network: 192.168.123.0/24
+:image: centos-7.1
+:cpus: ''
+:memory: ''
+:disks: 0
+:disksize: 40G
+:boxurlprefix: ''
+:sync: rsync
+:syncdir: ''
+:syncsrc: ''
+:folder: ''
+:extern:
+- type: git
+  system: shell
+  repository: https://github.com/purpleidea/shell-simple1
+  directory: shell-simple1
+:cd: ''
+:puppet: false
+:classes: []
+:shell:
+- shell-simple1/hello1.sh
+- shell-simple1/hello2.py
+- path: shell-simple1/subdirectory/hello3.sh
+  once: false
+- script: echo hello world > /tmp/hello4
+  once: true
+- echo hello again > /tmp/hello5
+:docker: []
+:kubernetes: false
+:ansible: []
+:playbook: []
+:ansible_extras: {}
+:cachier: false
+:vms: []
+:namespace: omv
+:count: 1
+:username: ''
+:password: ''
+:poolid: true
+:repos: []
+:update: false
+:reboot: false
+:unsafe: false
+:nested: false
+:tests: []
+:comment: simple shell run example
+:reallyrm: false

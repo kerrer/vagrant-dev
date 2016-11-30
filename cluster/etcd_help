@@ -1,0 +1,8 @@
+etcd:
+ node: curl -L http://192.168.56.42:4003/v2/keys/mykey -XPUT -d value="this is awesome"
+ node: curl -L http://192.168.56.42:4003/v2/keys/mykey
+ proxy: curl -L http://192.168.56.41:8081/v2/keys/mykey
+
+/goreman/install/goreman -f=/etc/Procfile  start
+
+ discover: https://discovery.etcd.io/new?size=3{不包括包括代理}

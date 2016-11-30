@@ -1,0 +1,18 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "79"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  cluster_ips:
+    - host: host1
+      ip: 192.168.56.42	
+    - host: host2
+      ip: 192.168.56.43	
+    - host: host3
+      ip: 192.168.56.44	
+    - host: master
+      ip: 192.168.56.41	
+

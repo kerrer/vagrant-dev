@@ -1,0 +1,11 @@
+---
+apt::proxy:
+   host: '172.17.0.2'
+   port: '3142'
+   https: false
+   ensure: 'present'
+jdk_oracle::version: "8"
+jdk_oracle::use_cache: true
+jdk_oracle::version_update: "51"
+jdk_oracle::version_build: "13"
+jdk_oracle::default_java: true

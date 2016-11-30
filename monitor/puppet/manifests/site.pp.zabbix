@@ -1,0 +1,22 @@
+node 'my1.max.com' {
+  class { 'apache':
+    mpm_module => 'prefork',
+  }
+  include apache::mod::php
+
+  #class { 'postgresql::server': }
+  class { 'mysql::server': }
+
+  class { 'zabbix':
+    zabbix_url    => 'zabbix.max.com',
+    database_type => 'mysql',
+    zabbix_api_user => 'admin',
+    zabbix_api_pass => 'mmmm'
+  }
+}
+
+node 'my2.max.com' {
+   class { 'zabbix::agent':
+     server => '192.168.56.41',
+  }
+}

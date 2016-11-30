@@ -1,0 +1,51 @@
+---
+  classes:
+    - "jdk_oracle"
+  jdk_oracle::version: "7"
+  jdk_oracle::use_cache: true
+  jdk_oracle::version_update: "79"
+  jdk_oracle::version_build: "13"
+  jdk_oracle::install_dir: "/usr/local/java"
+  hosts:
+   - host: sf.max.com
+     doc: sf.max.com
+   - host: yx.max.com
+     doc: yx.max.com
+   - host: in.max.com
+     doc: in.max.com
+   - host: zf.max.com
+     doc: WS_WAP_PAYWAP-PHP-UTF-8
+   - host: cm.max.com
+     doc: common.yx129.com
+  php::ensure: latest
+  php::manage_repos: true
+  php::fpm: true
+  php::dev: true
+  php::composer: true
+  php::pear: true
+  php::phpunit: false
+  php::fpm::config::log_level: notice
+  php::composer::auto_update: true
+  php::settings:
+    Date/date.timezone: Europe/Berlin
+  php::cli::settings:
+    PHP/memory_limit: 512M
+  php::fpm::settings:
+    PHP/short_open_tag: 'On'
+  php::extensions:
+    json: {}
+    mysql: {}
+    curl: {}
+    pgsql: {}
+    memcached:
+      provider: pecl
+      header_packages:
+        - libmemcached-dev
+    apc:
+      package_prefix: php-
+      settings:
+       apc.stat: 1
+       apc.stat_ctime: 1
+  php::fpm::pools:
+    www:
+      listen: 127.0.0.1:9000

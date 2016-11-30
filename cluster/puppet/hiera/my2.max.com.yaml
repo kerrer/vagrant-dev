@@ -1,0 +1,16 @@
+---
+  supervisord::programs:
+   'zookeeper':
+     directory: '/zookeeper/install'
+     command: '/zookeeper/install/bin/zkServer.sh start-foreground'
+     autostart: yes
+     autorestart: 'true'
+     stopsignal: 'KILL'
+     user: 'vagrant'
+   'kafka':
+     directory: '/kafka/install'
+     command: '/kafka/install/bin/kafka-server-start.sh /kafka/install/config/server.properties'
+     user: vagrant
+     autostart: true
+     autorestart: true
+     startsecs: 3 

@@ -1,0 +1,22 @@
+
+1.mkdir -p  /hadoop/{install,name,data1, data2,tmp}
+2.3.设置hadoop账户的ssh信任关系
+4.编辑HDFS配置文件,所以节点都有保持一致
+5.将配置复制到其他机器
+              #scp -r hbase-0.94.5  root@master01:/root/
+              #scp -r hbase-0.94.5  root@master02:/root/
+6.start[仅在master上]
+  bin/hdfs namenode -format 
+  sbin/start-dfs.sh (在namenode上执行)
+7.check
+http://namenode-name:50070/.
+bin/hdfs dfs -help
+hdfs:
+  
+  jps #在各个节点上执行jsp，观察是否都有对应的hdfs进程（namenode、secondarynamenode、datanode）
+  bin/hdfs fsck  /   # 检查hdfs状态
+  bin/hdfs dfsadmin -report #查看hdfs文件系统信息，包括空间容量和已用空间
+  bin/hdfs  dfs -ls / #查看hdfs根目录下所有文件
+  bin/hdfs  dfs -put localfile /hdfsfile # 将本地文件系统上localfile文件拷贝到hdfs根目录下hdfsfile文件
+  bin/hdfs  dfs rm /file
+  bin/hdfs  dfs -mkdir /hbase 

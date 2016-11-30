@@ -1,0 +1,9 @@
+---
+   cobbler::manage_dhcp     : 1
+   cobbler::server_ip       : '192.168.56.11'
+   cobbler::next_server_ip  : '192.168.56.11'
+   cobbler::allow_access    : '127.0.0.1 192.168.56.0/255.255.255.0'
+   cobbler::defaultrootpw   : '$1$random-p$L9oyWefMsW2K9xWZMruBt1'
+   cobbler::dhcp_interfaces : 'eth1'
+   cobbler::purge_profile: True
+   cobbler::purge_system:  True

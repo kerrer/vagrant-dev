@@ -1,0 +1,75 @@
+Tomcat 7 配置
+
+需要导入包
+
+下载地址：
+
+http://code.google.com/p/memcached-session-manager/downloads/list
+
+
+
+修改Tomcat目录conf文件夹的Context.xml。
+
+<Context>
+
+<Manager className="de.javakaffee.web.msm.MemcachedBackupSessionManager"
+
+memcachedNodes="n1:10.32.52.19:11211" //Memcache的ip地址
+
+sticky="true"
+
+sessionBackupAsync="false"
+
+lockingMode="none"
+
+requestUriIgnorePattern=".*\.(png|gif|jpg|css|js)$" transcoderFactoryClass="de.javakaffee.web.msm.serializer.javolution.JavolutionTranscoderFactory"
+
+/>
+
+</Context>
+
+测试
+
+Servlet代码：
+
+HttpSession sesion = request.getSession(false);
+
+if (sesion == null) {
+
+request.getSession();
+
+System.out.println("session is null");
+
+} else {
+
+Object id = sesion.getAttribute("id");
+
+Object test = sesion.getAttribute("test");
+
+if (id == null) {
+
+sesion.setAttribute("id", request.getRemoteAddr());
+
+}
+
+if (test == null) {
+
+sesion.setAttribute("test", "test");
+
+}
+
+System.out.println("test:id " + sesion.getAttribute("id"));
+
+System.out.println("test:test " + sesion.getAttribute("test"));
+
+}
+
+页面代码：
+
+<%
+
+System.out.println(session.getId());
+
+out.println("<br> SESSION ID:" + session.getId()+"<br>");
+
+%>

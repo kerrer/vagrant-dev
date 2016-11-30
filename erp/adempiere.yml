@@ -1,0 +1,7 @@
+---
+- name: node1
+  box: ubuntu/trusty64
+  ram: 1024
+  vcpu: 2
+  priv_ip: 192.168.56.101
+

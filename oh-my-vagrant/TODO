@@ -1,0 +1,14 @@
+TODO
+
+* Add nested virt test to see if host has it enabled
+** dustymabe+stribny will patch this
+*** http://dustymabe.com/2013/07/14/find-guest-ip-address-using-qemu-guest-agent/
+* Add automatic qemu agent + virtualbox agent installation
+** lala(virtualbox) + dustymabe(vagrant-libvirt) will work on this patch
+* Have a way to pass structured or non-string facts into the vms.
+** Puppet could support a B64FACTER_name=... where the data is a base64 yaml.
+*** This would be useful anyways, but isn't the ideal approach for vagrant.
+** One way could be to write to /etc/facter/facts.d/ before each puppet run.
+*** https://github.com/mitchellh/vagrant/issues/4762
+* Provide a way to add parameters to the classes we include.
+* Add some documentation.

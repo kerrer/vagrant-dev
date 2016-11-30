@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  tasks:
+    - name: test
+      command: pwd
+      
+    - shell: shell/install.sh >> logs/install.log   chdir=/vagrant/
+
+    

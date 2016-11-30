@@ -1,0 +1,43 @@
+$slaves = {'host0'=>'192.168.56.41','host1'=>'192.168.56.42','host2'=>'192.168.56.43','host3'=>'192.168.56.44'}
+$token ='da63ec1c37c7e32f2536ab53809c0f6f'
+node 'my1.max.com' {  
+   class {'lamp::cluster::ssh': }
+   class {'lamp::cluster::etcd':
+        proxy  =>true,
+        server_id =>0,
+        slaves => $slaves,
+        ip =>$slaves[host0],
+        token => $token
+   }
+}
+
+
+node 'my2.max.com' {  
+   class {'lamp::cluster::ssh': }
+   class {'lamp::cluster::etcd':
+        server_id =>1,
+        slaves => $slaves,
+        ip =>$slaves[host1],
+        token => $token,
+   }
+}
+
+node 'my3.max.com' {  
+  class {'lamp::cluster::ssh': }
+  class {'lamp::cluster::etcd':
+        server_id =>2,
+        slaves => $slaves,
+        ip =>$slaves[host2],
+        token => $token
+  }
+
+}
+node 'my4.max.com' {  
+  class {'lamp::cluster::ssh': }
+  class {'lamp::cluster::etcd':
+        server_id =>3,
+        slaves => $slaves,
+         ip =>$slaves[host3],
+        token => $token
+  }
+}

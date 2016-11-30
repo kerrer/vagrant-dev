@@ -1,0 +1,8 @@
+On Fedora 21+ Oh-My-Vagrant is now available as a COPR:
+https://copr.fedoraproject.org/coprs/purpleidea/oh-my-vagrant/
+https://ttboj.wordpress.com/2015/07/08/oh-my-vagrant-mainstream-mode-and-copr-rpms/
+
+For CentOS/RHEL 7+ it is almost as easy to install. Please read:
+https://ttboj.wordpress.com/2015/08/11/vagrant-and-oh-my-vagrant-on-rhel7/
+
+Happy Hacking!

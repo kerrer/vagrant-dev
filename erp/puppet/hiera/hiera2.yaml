@@ -1,0 +1,21 @@
+---
+:backends: 
+  - yaml
+  - json
+  
+:yaml:
+  :datadir: "/tmp/vagrant-puppet/hiera"
+  
+:hierarchy:
+  - "%{::hostname}"
+  - "%{::clientcert}"
+  - "%{::osfamily}"
+  - "%{::environment}"
+  - "virtual_%{::is_virtual}"
+  - %{::environment}/%{::role}
+  - %{::role}
+  - common
+  - java
+  - hosts
+
+:logger: console
