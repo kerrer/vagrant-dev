@@ -32,17 +32,6 @@ function set_apt_proxy {
     fi
 }
 
-function set_max_ubuntu {
-   sed -i 's/archive.ubuntu.com/mirrors.163.com/g' /etc/apt/sources.list
-   cat >> /etc/pip.conf <<END 
-   [global]
-   trusted-host=mirrors.aliyun.com 
-   index-url=http://mirrors.aliyun.com/pypi/simple/ 
-   END
-   
-}
-
-set_max_ubuntu
 set_apt_proxy
 
 # Get apt index files
