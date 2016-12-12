@@ -1,0 +1,162 @@
+diff --git a/labs/osbash/config/localrc b/labs/osbash/config/localrc
+index 316a330..2a895bd 100644
+--- a/labs/osbash/config/localrc
++++ b/labs/osbash/config/localrc
+@@ -1,13 +1,13 @@
+ # Set this if you already have the install ISO, but in a location other
+ # than IMG_DIR (which defaults to TOP_DIR/img)
+-#INSTALL_ISO=/data/iso/ubuntu/ubuntu-12.04.4-server-amd64.iso
++INSTALL_ISO=/job/iso/ubuntu-14.04.5-server-amd64.iso
+ 
+ # VM_PROXY will be used by osbash to get the ISO image and by apt/yum/wget once
+ # the operating system is installed (i.e. for software updates and
+ # installation). It should be sufficient to build a base disk if you have to
+ # use a proxy to connect to the Internet. Building the cluster itself does not
+ # require an Internet connection at all.
+-#VM_PROXY="http://192.168.178.20:3128"
++VM_PROXY="http://172.17.0.1:3128"
+ 
+ # Options:  ubuntu-12.04.4-server-amd64
+ #           ubuntu-14.04-server-amd64 (default)
+diff --git a/labs/osbash/lib/osbash/netboot/preseed-all-v2.cfg b/labs/osbash/lib/osbash/netboot/preseed-all-v2.cfg
+index 2182b82..f473593 100644
+--- a/labs/osbash/lib/osbash/netboot/preseed-all-v2.cfg
++++ b/labs/osbash/lib/osbash/netboot/preseed-all-v2.cfg
+@@ -15,13 +15,15 @@ d-i netcfg/get_hostname string osbash
+ d-i netcfg/get_domain string unassigned-domain
+ #-------------------------------------------------------------------------------
+ # Proxy
+-#d-i mirror/http/proxy string http://192.168.178.20:3128/
+-d-i mirror/http/proxy string
++d-i mirror/http/proxy string http://172.17.0.1:3128/
++d-i mirror/protocol string http
++d-i mirror/http/hostname string mirrors.aliyun.com
++d-i mirror/http/directory string /ubuntu
+ #-------------------------------------------------------------------------------
+ ### Clock and time zone setup
+ # Controls whether or not the hardware clock is set to UTC.
+ d-i clock-setup/utc boolean true
+-d-i time/zone string Etc/UTC
++d-i time/zone string Asia/Shanghai
+ #-------------------------------------------------------------------------------
+ ### Partitioning
+ # The presently available methods are:
+diff --git a/labs/osbash/lib/osbash/netboot/preseed-all.cfg b/labs/osbash/lib/osbash/netboot/preseed-all.cfg
+index 1698dcf..7f7d41b 100644
+--- a/labs/osbash/lib/osbash/netboot/preseed-all.cfg
++++ b/labs/osbash/lib/osbash/netboot/preseed-all.cfg
+@@ -15,13 +15,15 @@ d-i netcfg/get_hostname string osbash
+ d-i netcfg/get_domain string unassigned-domain
+ #-------------------------------------------------------------------------------
+ # Proxy
+-#d-i mirror/http/proxy string http://192.168.178.20:3128/
+-d-i mirror/http/proxy string
++d-i mirror/http/proxy string http://172.17.0.1:3128/
++d-i mirror/protocol string http
++d-i mirror/http/hostname string mirrors.aliyun.com
++d-i mirror/http/directory string /ubuntu
+ #-------------------------------------------------------------------------------
+ ### Clock and time zone setup
+ # Controls whether or not the hardware clock is set to UTC.
+ d-i clock-setup/utc boolean true
+-d-i time/zone string Etc/UTC
++d-i time/zone string Asia/Shanghai
+ #-------------------------------------------------------------------------------
+ ### Partitioning
+ # The presently available methods are:
+diff --git a/labs/osbash/lib/osbash/virtualbox-install_base.sh b/labs/osbash/lib/osbash/virtualbox-install_base.sh
+index 8413e7b..0d28637 100644
+--- a/labs/osbash/lib/osbash/virtualbox-install_base.sh
++++ b/labs/osbash/lib/osbash/virtualbox-install_base.sh
+@@ -30,7 +30,7 @@ function vm_install_base {
+ 
+     echo >&2 -e "${CInfo:-}Install ISO:\n\t${CData:-}$INSTALL_ISO${CReset:-}"
+ 
+-    ${OSBASH:-:} check_md5 "$INSTALL_ISO" "$ISO_MD5"
++    #${OSBASH:-:} check_md5 "$INSTALL_ISO" "$ISO_MD5"
+ 
+     $VBM storageattach "$vm_name" \
+         --storagectl IDE \
+diff --git a/labs/osbash/scripts/osbash/base_fixups.sh b/labs/osbash/scripts/osbash/base_fixups.sh
+index c2cc405..19a97c6 100755
+--- a/labs/osbash/scripts/osbash/base_fixups.sh
++++ b/labs/osbash/scripts/osbash/base_fixups.sh
+@@ -14,3 +14,4 @@ exec_logfile
+ # match Vagrant which removes 70-persistent-net.rules (so we get the same
+ # names for our network interfaces)
+ sudo rm -f /etc/udev/rules.d/70-persistent-net.rules
++echo "finish base_fixups.sh"
+diff --git a/labs/osbash/scripts/ubuntu/apt_init.sh b/labs/osbash/scripts/ubuntu/apt_init.sh
+index 7d3052f..679eee1 100755
+--- a/labs/osbash/scripts/ubuntu/apt_init.sh
++++ b/labs/osbash/scripts/ubuntu/apt_init.sh
+@@ -9,8 +9,10 @@ source "$CONFIG_DIR/openstack"
+ source "$CONFIG_DIR/localrc"
+ source "$LIB_DIR/functions.guest.sh"
+ 
++echo "finish 1"
+ indicate_current_auto
+ 
++echo "finish 2"
+ exec_logfile
+ 
+ function set_apt_proxy {
+@@ -30,12 +32,21 @@ function set_apt_proxy {
+         # Proxy requested, but none configured: add line
+         echo "$PRX_KEY \"$VM_PROXY\";" | sudo tee -a $APT_FILE
+     fi
++    
++    sudo sed -i 's/us.archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list 
++    cat << DEB |sudo tee /etc/pip.conf
++[global]
++trusted-host=mirrors.aliyun.com
++index-url=http://mirrors.aliyun.com/pypi/simple/
++DEB
++   echo "finish 3"
+ }
+ 
+ set_apt_proxy
+ 
+ # Get apt index files
+ sudo apt-get update
++echo "finish 4"
+ 
+ function ubuntu_cloud_archive {
+     # cloud-keyring to verify packages from ubuntu-cloud repo
+@@ -50,6 +61,7 @@ function ubuntu_cloud_archive {
+     sudo apt-get -y install software-properties-common \
+                             python-software-properties
+     sudo add-apt-repository -y "cloud-archive:$OPENSTACK_RELEASE"
++    echo "finish 5"
+ }
+ 
+ function ubuntu_cloud_staging {
+@@ -66,6 +78,7 @@ function ubuntu_cloud_staging {
+ deb http://ppa.launchpad.net/ubuntu-cloud-archive/$OPENSTACK_RELEASE/ubuntu trusty main
+ deb-src http://ppa.launchpad.net/ubuntu-cloud-archive/$OPENSTACK_RELEASE/ubuntu trusty main
+ DEB
++    echo "finish 6"
+ }
+ 
+ # precise needs the cloud archive, and so does trusty for non-Icehouse releases
+@@ -89,4 +102,5 @@ if grep -qs DISTRIB_CODENAME=precise /etc/lsb-release ||
+         echo "ERROR: apt source not found: /etc/apt/sources.list.d/$src_list"
+         exit 1
+     fi
++    echo "finish 7"
+ fi
+diff --git a/labs/osbash/scripts/ubuntu/apt_upgrade.sh b/labs/osbash/scripts/ubuntu/apt_upgrade.sh
+index b5eb6e9..a7cf8f5 100755
+--- a/labs/osbash/scripts/ubuntu/apt_upgrade.sh
++++ b/labs/osbash/scripts/ubuntu/apt_upgrade.sh
+@@ -20,8 +20,8 @@ exec_logfile
+ # Note: We assume that apt_init.sh set up repos and updated the apt index files
+ 
+ # Upgrade installed packages and the kernel
+-sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
+-sudo apt-get -y dist-upgrade
++sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew"  upgrade
++sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew"  dist-upgrade
+ 
+ # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ # Extra work not documented in install-guide

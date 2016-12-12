@@ -10,7 +10,7 @@ indicate_current_auto
 
 #------------------------------------------------------------------------------
 # Create the provier (external) network and a subnet on it
-# http://docs.openstack.org/newton/install-guide-ubuntu/launch-instance-networks-provider.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-networks-provider.html
 #------------------------------------------------------------------------------
 
 echo "Sourcing the admin credentials."
@@ -54,11 +54,9 @@ echo "Creating a subnet on the public network."
 neutron subnet-create --name provider  \
     --allocation-pool start="$START_IP_ADDRESS,end=$END_IP_ADDRESS" \
     --dns-nameserver "$DNS_RESOLVER" \
-    --gateway "$PROVIDER_NETWORK_GATEWAY" \
-    provider "$PROVIDER_NETWORK_CIDR"
+    --gateway "$PUBLIC_NETWORK_GATEWAY" \
+    provider "$PUBLIC_NETWORK_CIDR"
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Not in install-guide:
 echo -n "Waiting for DHCP namespace."
 until [ "$(ip netns | grep -c -o "^qdhcp-[a-z0-9-]*")" -gt 0 ]; do
     sleep 1
@@ -75,4 +73,3 @@ done
 echo
 
 /sbin/brctl show
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

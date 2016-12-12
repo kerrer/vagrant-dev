@@ -9,8 +9,10 @@ source "$CONFIG_DIR/openstack"
 source "$CONFIG_DIR/localrc"
 source "$LIB_DIR/functions.guest.sh"
 
+echo "finish 1"
 indicate_current_auto
 
+echo "finish 2"
 exec_logfile
 
 function set_apt_proxy {
@@ -30,56 +32,75 @@ function set_apt_proxy {
         # Proxy requested, but none configured: add line
         echo "$PRX_KEY \"$VM_PROXY\";" | sudo tee -a $APT_FILE
     fi
+    
+    sudo sed -i 's/us.archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list 
+    cat << DEB |sudo tee /etc/pip.conf
+[global]
+trusted-host=mirrors.aliyun.com
+index-url=http://mirrors.aliyun.com/pypi/simple/
+DEB
+   echo "finish 3"
 }
 
 set_apt_proxy
 
 # Get apt index files
 sudo apt-get update
+echo "finish 4"
 
-# ---------------------------------------------------------------------------
-# Enable the OpenStack repository
-# http://docs.openstack.org/newton/install-guide-ubuntu/environment-packages.html
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# NOTE: Using pre-release staging ppa is not documented in install-guide
-# https://launchpad.net/~ubuntu-cloud-archive/+archive/ubuntu/newton-staging
-#--------------------------------------------------------------------------
+function ubuntu_cloud_archive {
+    # cloud-keyring to verify packages from ubuntu-cloud repo
+    sudo apt-get install ubuntu-cloud-keyring
 
-echo "Installing packages needed for add-apt-repository."
-sudo apt-get -y install software-properties-common
+    #--------------------------------------------------------------------------
+    # Enable the OpenStack repository
+    # http://docs.openstack.org/mitaka/install-guide-ubuntu/environment-packages.html
+    #--------------------------------------------------------------------------
 
-case "$OPENSTACK_RELEASE" in
-    newton)
-        REPO=cloud-archive:newton
-        SRC_FILE=cloudarchive-newton.list
-        ;;
-    newton-proposed)
-        REPO=cloud-archive:newton-proposed
-        SRC_FILE=cloudarchive-newton-proposed.list
-        ;;
-    newton-staging)
-        REPO=ppa:ubuntu-cloud-archive/newton-staging
-        SRC_FILE=ubuntu-cloud-archive-ubuntu-newton-staging-xenial.list
-        ;;
-    *)
-        echo >&2 "Unknown OpenStack release: $OPENSTACK_RELEASE. Aborting."
+    # Install packages needed for add-apt-repository
+    sudo apt-get -y install software-properties-common \
+                            python-software-properties
+    sudo add-apt-repository -y "cloud-archive:$OPENSTACK_RELEASE"
+    echo "finish 5"
+}
+
+function ubuntu_cloud_staging {
+    #--------------------------------------------------------------------------
+    # Enable the OpenStack repository
+    # https://launchpad.net/~ubuntu-cloud-archive/+archive/ubuntu/mitaka-staging
+    #
+    # NOTE: Using pre-release staging ppa is not documented in install-guide
+    #--------------------------------------------------------------------------
+
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9F68104E
+
+    cat << DEB |sudo tee /etc/apt/sources.list.d/cloudarchive-$OPENSTACK_RELEASE.list
+deb http://ppa.launchpad.net/ubuntu-cloud-archive/$OPENSTACK_RELEASE/ubuntu trusty main
+deb-src http://ppa.launchpad.net/ubuntu-cloud-archive/$OPENSTACK_RELEASE/ubuntu trusty main
+DEB
+    echo "finish 6"
+}
+
+# precise needs the cloud archive, and so does trusty for non-Icehouse releases
+if grep -qs DISTRIB_CODENAME=precise /etc/lsb-release ||
+        [ "$OPENSTACK_RELEASE" != "icehouse" ]; then
+    if [[ "$OPENSTACK_RELEASE" =~ staging ]]; then
+        echo "Enabling the Ubuntu cloud staging ppa."
+        ubuntu_cloud_staging
+    else
+        echo "Enabling the Ubuntu cloud archive."
+        ubuntu_cloud_archive
+    fi
+
+    # Get index files only for ubuntu-cloud repo but keep standard lists
+    src_list=cloudarchive-$OPENSTACK_RELEASE.list
+    if [ -f "/etc/apt/sources.list.d/$src_list" ]; then
+        sudo apt-get update \
+            -o Dir::Etc::sourcelist="sources.list.d/$src_list" \
+            -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+    else
+        echo "ERROR: apt source not found: /etc/apt/sources.list.d/$src_list"
         exit 1
-        ;;
-esac
-
-echo "Adding cloud repo: $REPO"
-sudo add-apt-repository "$REPO"
-
-# Get index files only for ubuntu-cloud repo but keep standard lists
-if [ -f "/etc/apt/sources.list.d/$SRC_FILE" ]; then
-    sudo apt-get update \
-        -o Dir::Etc::sourcelist="sources.list.d/$SRC_FILE" \
-        -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
-else
-    echo "ERROR: apt source not found: /etc/apt/sources.list.d/$SRC_FILE"
-    exit 1
+    fi
+    echo "finish 7"
 fi
-
-# Disable automatic updates (they compete with our scripts for the dpkg lock)
-sudo systemctl disable apt-daily.service
-sudo systemctl disable apt-daily.timer

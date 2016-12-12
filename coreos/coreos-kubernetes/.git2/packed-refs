@@ -1,0 +1,36 @@
+# pack-refs with: peeled fully-peeled 
+395526d3eb8c91bad8196499fb18ff1dcde7a6fe refs/remotes/origin/1.3-updates
+e9fcccb1b87be0ad6a054a8d423c1d1be76d6289 refs/remotes/origin/certs-hack
+88a65adac350f96c3a42211c20c94dfe8f206fee refs/remotes/origin/chancez-docs-update
+17403ab0f7e321ffd0922cf9dd991b9110c561db refs/remotes/origin/docs-calico
+60a24be509fcf123c15f9dda8cfae609911ede3c refs/remotes/origin/docs-equals
+d72ec59f13db3152f0eaa6b118e8aa68f731de86 refs/remotes/origin/docs-formatting-launch
+fb59512d4208ab710225c2a425f5fa33348f6ca3 refs/remotes/origin/docs-upgrade-formatting
+f8f8d6e914a297236519f0602876201585280f20 refs/remotes/origin/master
+f54ae0b8c806cc153f7ca2e5a252572eda377342 refs/remotes/origin/os-x-build-script
+3743094e87c7d6479c24ac21c08ea930f87d3abf refs/remotes/origin/philips-patch-1
+ef2ed05255f3b7455f832a67ba2c88c2fd11b697 refs/remotes/origin/philips-patch-2
+e818b3e62782e7da7425781fa82be1d9a3efc5ca refs/remotes/origin/robszumski-patch-1
+3ee8c9383cd218c98c231a18841595e5caf3099c refs/remotes/origin/update-addons-1.2
+23e20ecd62ff42e5293dd04428a6123af6aeee44 refs/remotes/origin/update-addons-1.2-rebased
+68d7df6514269fe7d004e4c32debb569eaa7433a refs/remotes/origin/volume_plugin
+3b3908d1f0bb5dad288bad203f3755684b935341 refs/tags/v0.1.0
+^a43c4bb8d535ad1bc24f259c1da31b0fb293f786
+d32491118fc32b8cab5addbf5cfcb99acd4fc59e refs/tags/v0.1.1
+^846c27b56be46502e26764d4c021b792e7ee192d
+5c173b0d7043619030083c7f288b644ff6f3b110 refs/tags/v0.2.0
+^59fc1fc624687dee4104ba97121ca79fb8e64e0d
+a036d211a7c0d155ea8c28cc2b4569bea6992250 refs/tags/v0.3.0
+^98e55b56152dffbfa1cb1a00ee427263426f0fae
+674dec5fcbd25b808259cd237188d3246294283d refs/tags/v0.4.0
+b92bea196cec901614041aa4fb3af9d5f3137027 refs/tags/v0.4.1
+f6b854840ba9115c05dd19012a0510822dedcac4 refs/tags/v0.5.1
+6a68607453218d5449cf6346f48b30bccf660212 refs/tags/v0.6.0
+df7272a84df470ad96de4be92de5f1b65570ba6e refs/tags/v0.6.1
+fe019af4ab9188981f9dc9c04b92152d540ecb18 refs/tags/v0.7.0
+^ad71e34bcc5367f7114f2d3f93870e081e60bbd4
+6d6032d9408812afbe4e35daf8d90b30b792b7f4 refs/tags/v0.7.1
+1611e91cc1105e24870a9eaf8b162717d5cb1cab refs/tags/v0.8.0
+3eb5cf82f18511cb3fa702add79099afe1a6f4ae refs/tags/v0.8.1
+4732770f5effb52ed34bb3fe200fa4637d0b422f refs/tags/v0.8.2
+fd74bd4dd0a03aac31bfc65182e76f592e02ed9e refs/tags/v0.8.3

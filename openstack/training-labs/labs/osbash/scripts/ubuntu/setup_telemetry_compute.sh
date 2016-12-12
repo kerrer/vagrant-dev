@@ -15,17 +15,13 @@ indicate_current_auto
 
 #------------------------------------------------------------------------------
 # Enable Compute service meters
-# http://docs.openstack.org/project-install-guide/telemetry/newton/configure_services/nova/install-nova-ubuntu.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/ceilometer-nova.html
 #------------------------------------------------------------------------------
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Install and configure components
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "Installing ceilometer."
 sudo apt-get install -y ceilometer-agent-compute
 
-ceilometer_admin_user=ceilometer
+ceilometer_admin_user=$(service_to_user_name ceilometer)
 
 conf=/etc/ceilometer/ceilometer.conf
 echo "Configuring $conf."
@@ -53,19 +49,15 @@ iniset_sudo $conf keystone_authtoken username "$ceilometer_admin_user"
 iniset_sudo $conf keystone_authtoken password "$CEILOMETER_PASS"
 
 # Configure [service_credentials] section.
-iniset_sudo $conf service_credentials auth_url http://controller:5000
-iniset_sudo $conf service_credentials project_domain_id default
-iniset_sudo $conf service_credentials user_domain_id default
-iniset_sudo $conf service_credentials auth_type password
-iniset_sudo $conf service_credentials username "$ceilometer_admin_user"
-iniset_sudo $conf service_credentials project_name "$SERVICE_PROJECT_NAME"
-iniset_sudo $conf service_credentials password "$CEILOMETER_PASS"
+iniset_sudo $conf service_credentials os_auth_url http://controller:5000/v2.0
+iniset_sudo $conf service_credentials os_username "$ceilometer_admin_user"
+iniset_sudo $conf service_credentials os_tenant_name "$SERVICE_PROJECT_NAME"
+iniset_sudo $conf service_credentials os_password "$CEILOMETER_PASS"
 iniset_sudo $conf service_credentials interface internalURL
 iniset_sudo $conf service_credentials region_name "$REGION"
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Configure Compute to use Telemetry
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Marked "optional" in install-guide
+iniset_sudo $conf DEFAULT verbose True
 
 echo "Configuring nova.conf."
 conf=/etc/ceilometer/ceilometer.conf
@@ -74,12 +66,7 @@ conf=/etc/ceilometer/ceilometer.conf
 iniset_sudo $conf DEFAULT instance_usage_audit True
 iniset_sudo $conf DEFAULT instance_usage_audit_period hour
 iniset_sudo $conf DEFAULT notify_on_state_change vm_and_task_state
-
-iniset_sudo $conf oslo_messaging_notifications driver messagingv2
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Finalize installation
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+iniset_sudo $conf DEFAULT notification_driver messagingv2
 
 echo "Restarting telemetry service."
 sudo service ceilometer-agent-compute restart
@@ -89,7 +76,7 @@ sudo service nova-compute restart
 
 #------------------------------------------------------------------------------
 # Enable Block Storage meters
-# http://docs.openstack.org/project-install-guide/telemetry/newton/configure_services/cinder/install-cinder-ubuntu.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/ceilometer-cinder.html
 #------------------------------------------------------------------------------
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -101,12 +88,12 @@ echo "Configuring $conf."
 
 iniset_sudo $conf oslo_messaging_notifications driver messagingv2
 
-echo "Restarting the Block Storage services."
+echo "Restarting cinder-volumes service."
 sudo service cinder-volume restart
 
 #------------------------------------------------------------------------------
 # Verify operation
-# http://docs.openstack.org/project-install-guide/telemetry/newton/verify.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/ceilometer-verify.html
 #------------------------------------------------------------------------------
 
 echo "Verifying the Telemetry installation."

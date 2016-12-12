@@ -1,6 +1,12 @@
 
 openstack/training-labs
 url = git://git.openstack.org/openstack/training-labs.git
+
+coreos/kubernetes
+url = https://github.com/coreos/coreos-kubernetes.git
+
+path = coreos-vagrant
+url = https://github.com/coreos/coreos-vagrant.git
 ========================
 [submodule "openstack/puppet-openstack"]
 	path = openstack/puppet-openstack
@@ -39,9 +45,6 @@ url = git://git.openstack.org/openstack/training-labs.git
 	path = openstack/all-in-one
 	url = https://github.com/openstack/puppet-openstack-integration.git
 
-[submodule "coreos-vagrant"]
-	path = coreos-vagrant
-	url = https://github.com/coreos/coreos-vagrant.git
 [submodule "coreos/kubernetes-cluster"]
 	path = coreos/kubernetes-cluster
 	url = https://github.com/pires/kubernetes-vagrant-coreos-cluster.git

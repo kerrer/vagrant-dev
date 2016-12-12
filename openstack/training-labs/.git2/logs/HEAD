@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 0d2597474d89e8c7175aae4ac0a5e65ab6e096bb tanfangcheng <tanfangcheng@wanfin.com> 1481253207 +0800	clone: from https://github.com/openstack/training-labs.git
+0d2597474d89e8c7175aae4ac0a5e65ab6e096bb e229aea8abf35c2db119c21718d4064feb8390a0 tanfangcheng <tanfangcheng@wanfin.com> 1481253273 +0800	checkout: moving from master to stable/newton
+e229aea8abf35c2db119c21718d4064feb8390a0 81caccacc5619cd2e4f7c2ee3cf430d0b28ae862 tanfangcheng <tanfangcheng@wanfin.com> 1481253719 +0800	commit: add my config

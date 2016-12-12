@@ -1,0 +1,7 @@
+# pack-refs with: peeled fully-peeled 
+88553507f5aeab9935f71a04de7e461a3562d6ee refs/remotes/origin/27-dockercfg-file
+a0a0a5f18d2391c50bea0ebdfebddeaa524fa7bd refs/remotes/origin/feature/vmware_fusion
+4d03d00b6c7dd12ec9f0119a7bff072d502b0d8e refs/remotes/origin/fix-26
+c4e60f7cb877492d764332e8199131366e34d24e refs/remotes/origin/fix-default-vpc-detection
+314b7748110263400244703ffa1eeb2da5380b68 refs/remotes/origin/master
+13b0a4b71c0c580bfc10e2b781b1a189eb4a7bd9 refs/remotes/origin/pre-baked-images

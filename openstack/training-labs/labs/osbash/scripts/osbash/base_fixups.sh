@@ -14,3 +14,4 @@ exec_logfile
 # match Vagrant which removes 70-persistent-net.rules (so we get the same
 # names for our network interfaces)
 sudo rm -f /etc/udev/rules.d/70-persistent-net.rules
+echo "finish base_fixups.sh"

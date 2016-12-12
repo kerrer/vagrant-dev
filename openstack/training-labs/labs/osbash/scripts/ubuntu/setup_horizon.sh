@@ -13,19 +13,13 @@ indicate_current_auto
 
 #------------------------------------------------------------------------------
 # Set up OpenStack Dashboard (horizon)
-# http://docs.openstack.org/newton/install-guide-ubuntu/horizon-install.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/horizon-install.html
 #------------------------------------------------------------------------------
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Install and configure components
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Note: Installing the dashboard here reloads the apache configuration.
-#       Below, we are also changing the configuration and reloading it once we
-#       are done. This race can result in a stopped apache (which also means
-#       stopped keystone services). We can either sleep for a second
-#       after the "apt-get install" call below or do a restart instead
-#       of a reload when we are done changing the configuration files.
 echo "Installing horizon."
 sudo apt-get install -y openstack-dashboard
 
@@ -36,7 +30,7 @@ auth_host=controller
 echo "Setting OPENSTACK_HOST = \"$auth_host\"."
 iniset_sudo_no_section $conf "OPENSTACK_HOST" "\"$auth_host\""
 
-echo "Allowing all hosts to access the dashboard:"
+echo "Allowing all hosts to access the dashboard: "
 iniset_sudo_no_section $conf "ALLOWED_HOSTS" "['*', ]"
 
 echo "Telling horizon to use the cache for sessions."
@@ -44,7 +38,7 @@ iniset_sudo_no_section $conf "SESSION_ENGINE" "'django.contrib.sessions.backends
 
 echo "Setting interface location of memcached."
 sudo sed -i "/LOCATION/ s/127.0.0.1/controller/" $conf
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 echo "Comparing $conf to memcached.conf."
 memcached_conf=/etc/memcached.conf
 # Port is a number on line starting with "-p "
@@ -68,7 +62,6 @@ fi
 
 echo "CACHES configuration in $conf:"
 awk '/^CACHES =/,/^}/' $conf
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "Enabling Identity API version 3."
 iniset_sudo_no_section $conf "OPENSTACK_KEYSTONE_URL" '"http://%s:5000/v3" % OPENSTACK_HOST'
@@ -99,7 +92,7 @@ echo "Setting timezone to UTC."
 iniset_sudo_no_section $conf "TIME_ZONE" '"UTC"'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Customize Horizon (not in install-guide)
+# Customize Horizon
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "Removing default Ubuntu theme."
@@ -110,5 +103,4 @@ sudo apt-get remove --auto-remove -y openstack-dashboard-ubuntu-theme
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "Reloading the web server configuration."
-# Restarting instead of reloading for reasons explained in comment above.
-sudo service apache2 restart
+sudo service apache2 reload

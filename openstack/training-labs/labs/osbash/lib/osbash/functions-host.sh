@@ -188,14 +188,10 @@ function vm_scp_to_vm {
         local target_path=$(strip_top_dir "$src_path")
         local target_dir=$(dirname "$target_path")
         vm_ssh "$ssh_port" "mkdir -p $target_dir"
-        # To avoid getting stuck on broken ssh connection, disable connection
-        # sharing (ControlPath) and use a timeout when connecting.
         scp -q -r \
             -i "$LIB_DIR/osbash-ssh-keys/osbash_key" \
             -o "UserKnownHostsFile /dev/null" \
             -o "StrictHostKeyChecking no" \
-            -o ConnectTimeout=10 \
-            -o ControlPath=none \
             -P "$ssh_port" \
             "$src_path" "$VM_SHELL_USER@$ssh_ip:$target_path"
     done
@@ -212,14 +208,10 @@ function vm_ssh {
     # Some operating systems (e.g., Mac OS X) export locale settings to the
     # target that cause some Python clients to fail. Override with a standard
     # setting (LC_ALL=C).
-    # To avoid getting stuck on broken ssh connection, disable connection
-    # sharing (ControlPath) and use a timeout when connecting.
     LC_ALL=C ssh -q \
         -i "$LIB_DIR/osbash-ssh-keys/osbash_key" \
         -o "UserKnownHostsFile /dev/null" \
         -o "StrictHostKeyChecking no" \
-        -o ConnectTimeout=10 \
-        -o ControlPath=none \
         -p "$ssh_port" \
         "$VM_SHELL_USER@$ssh_ip" "$@"
 }
@@ -504,12 +496,6 @@ function command_from_config {
         create_pxe_node)
             # Format: create_pxe_node [-n <node_name>]
             get_cmd_options $args
-            if [ "$PROVIDER" = "kvm" ]; then
-                echo -e >&2 "${CError:-}PXE booting with KVM is currently" \
-                    "not supported.\nPlease file a bug if you need it." \
-                    "${CReset:-}"
-                exit 1
-            fi
             # Set FIRST_DISK_SIZE to disable use of basedisk for PXE booting
             FIRST_DISK_SIZE=10000
             echo >&2 "PXE boot node, set FIRST_DISK_SIZE=$FIRST_DISK_SIZE."

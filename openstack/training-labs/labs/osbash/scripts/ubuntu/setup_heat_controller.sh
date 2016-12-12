@@ -12,12 +12,9 @@ exec_logfile
 
 indicate_current_auto
 
-# Wait for keystone to come up
-wait_for_keystone
-
 #------------------------------------------------------------------------------
-# Install the Orchestration Service (heat)
-# http://docs.openstack.org/project-install-guide/orchestration/newton/install-ubuntu.html
+# Install the Orchestration Service (heat).
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/heat-install.html
 #------------------------------------------------------------------------------
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,7 +27,7 @@ setup_database heat "$HEAT_DB_USER" "$HEAT_DBPASS"
 echo "Sourcing the admin credentials."
 source "$CONFIG_DIR/admin-openstackrc.sh"
 
-heat_admin_user=heat
+heat_admin_user=$(service_to_user_name heat)
 
 # Wait for keystone to come up
 wait_for_keystone
@@ -95,7 +92,6 @@ openstack user create \
 
 openstack role add \
     --domain heat \
-    --user-domain heat \
     --user heat_domain_admin \
     "$ADMIN_ROLE_NAME"
 
@@ -116,7 +112,6 @@ openstack role create "heat_stack_user"
 
 echo "Installing heat."
 
-# Not in install-guide:
 # Prevent start of heat services here so they don't get confused by the default
 # configuration files. Otherwise, it takes up to 3 minutes for the heat
 # stack-list to appear after the heat services restart below.
@@ -162,7 +157,7 @@ iniset_sudo $conf keystone_authtoken username "$heat_admin_user"
 iniset_sudo $conf keystone_authtoken password "$HEAT_PASS"
 
 # Configure [trustee] section.
-iniset_sudo $conf trustee auth_type password
+iniset_sudo $conf trustee auth_plugin password
 iniset_sudo $conf trustee auth_url http://controller:35357
 iniset_sudo $conf trustee username "$heat_admin_user"
 iniset_sudo $conf trustee password "$HEAT_PASS"
@@ -190,7 +185,7 @@ sudo heat-manage db_sync
 # Finalize installation
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Not in install-guide: Re-enable automatic start of heat services
+# Re-enable automatic start of heat services
 sudo rm /etc/init/heat-api.override
 sudo rm /etc/init/heat-api-cfn.override
 sudo rm /etc/init/heat-engine.override
@@ -201,18 +196,21 @@ sudo service heat-api restart
 sudo service heat-api-cfn restart
 sudo service heat-engine restart
 
-echo -n "Waiting for openstack stack list."
-until openstack stack list; do
+echo -n "Waiting for heat stack-list."
+until heat stack-list; do
     sleep 1
     echo -n .
 done
 ENDTIME=$(date +%s)
 echo "Restarting heat servies took $((ENDTIME - STARTTIME)) seconds."
 
+echo "Removing default SQLite database."
+sudo rm -f /var/lib/heat/heat.sqlite
+
 #------------------------------------------------------------------------------
 # Verify operation of Orchestration Service (heat).
-# http://docs.openstack.org/project-install-guide/orchestration/newton/verify.html
+# http://docs.openstack.org/mitaka/install-guide-ubuntu/heat-verify.html
 #------------------------------------------------------------------------------
 
 echo "Listing service components."
-openstack orchestration service list
+heat service-list

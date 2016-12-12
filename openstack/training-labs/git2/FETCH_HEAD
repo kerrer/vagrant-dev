@@ -1,6 +1,0 @@
-6d31fb86b08be63af079556929294cc89ca098ec		branch 'master' of git://git.openstack.org/openstack/training-labs
-a9e771684282377424fc2f8ba095afd71d5b1728	not-for-merge	branch 'icehouse-eol' of git://git.openstack.org/openstack/training-labs
-23cdec102c8e3b1e49880a3c020f00d49ae66fcc	not-for-merge	branch 'juno-eol' of git://git.openstack.org/openstack/training-labs
-7b2a649799ccacd70a0ab41af016359468ef138a	not-for-merge	branch 'stable/liberty' of git://git.openstack.org/openstack/training-labs
-61d1f7e8c477d344401e725563b0d7c80a28cb2b	not-for-merge	branch 'stable/mitaka' of git://git.openstack.org/openstack/training-labs
-e229aea8abf35c2db119c21718d4064feb8390a0	not-for-merge	branch 'stable/newton' of git://git.openstack.org/openstack/training-labs

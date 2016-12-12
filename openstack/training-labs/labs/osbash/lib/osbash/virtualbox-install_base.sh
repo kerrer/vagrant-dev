@@ -30,7 +30,7 @@ function vm_install_base {
 
     echo >&2 -e "${CInfo:-}Install ISO:\n\t${CData:-}$INSTALL_ISO${CReset:-}"
 
-    ${OSBASH:-:} check_md5 "$INSTALL_ISO" "$ISO_MD5"
+    #${OSBASH:-:} check_md5 "$INSTALL_ISO" "$ISO_MD5"
 
     $VBM storageattach "$vm_name" \
         --storagectl IDE \
