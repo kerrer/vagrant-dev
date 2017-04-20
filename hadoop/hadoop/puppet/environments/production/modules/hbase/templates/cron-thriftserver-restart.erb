@@ -1,3 +1,0 @@
-PATH="/sbin:/usr:sbin:/bin:/usr/bin"
-
-<%= scope.lookupvar('hbase::features')["restarts"] -%>	root	service <%= scope.lookupvar('hbase::daemons')['thriftserver'] -%> restart >/tmp/hbase-thriftserver-restart.log 2>&1
