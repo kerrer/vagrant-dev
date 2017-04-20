@@ -1,0 +1,6 @@
+:cachedir: 'cache/r10k'
+
+:sources:
+  :base:
+    remote: 'git@github.com:puppetmax/puppet-r10k.git'
+    basedir: 'environments'

@@ -1,0 +1,4 @@
+# pack-refs with: peeled fully-peeled 
+1f2e16010058950a3803e7daadf48a34cb0a4c72 refs/remotes/origin/master
+1f2e16010058950a3803e7daadf48a34cb0a4c72 refs/remotes/origin/puppet-r10k-tutorial
+73febc9a1de80fc14e10f6ca122da0bb06932c32 refs/remotes/origin/tutorial-part-two
