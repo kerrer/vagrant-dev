@@ -1,0 +1,142 @@
+diff --git a/lib/init-ssl b/lib/init-ssl
+index 7f1e0c0..c338862 100755
+--- a/lib/init-ssl
++++ b/lib/init-ssl
+@@ -3,7 +3,7 @@ set -e
+ 
+ # define location of openssl binary manually since running this
+ # script under Vagrant fails on some systems without it
+-OPENSSL=$(which openssl)
++OPENSSL=/usr/bin/openssl
+ 
+ function usage {
+     echo "USAGE: $0 <output-dir> <cert-base-name> <CN> [SAN,SAN,SAN]"
+diff --git a/lib/init-ssl-ca b/lib/init-ssl-ca
+index 84d4d08..576fc5c 100755
+--- a/lib/init-ssl-ca
++++ b/lib/init-ssl-ca
+@@ -3,7 +3,7 @@ set -e
+ 
+ # define location of openssl binary manually since running this
+ # script under Vagrant fails on some systems without it
+-OPENSSL=$(which openssl)
++OPENSSL=/usr/bin/openssl
+ 
+ function usage {
+     echo "USAGE: $0 <output-dir>"
+diff --git a/multi-node/generic/controller-install.sh b/multi-node/generic/controller-install.sh
+index a856516..27361ff 100644
+--- a/multi-node/generic/controller-install.sh
++++ b/multi-node/generic/controller-install.sh
+@@ -943,6 +943,34 @@ spec:
+               value: "true"
+ EOF
+     fi
++
++    local TEMPLATE=/etc/systemd/system/docker.service.d/50-insecure-registry.conf
++    if [ ! -f "${TEMPLATE}" ]; then
++        echo "TEMPLATE: $TEMPLATE"
++        mkdir -p $(dirname $TEMPLATE)
++        cat << EOF > $TEMPLATE
++        [Service]
++        Environment='DOCKER_OPTS=--registry-mirror="https://proxy.tdocker.com:5000" --insecure-registry="proxy.tdocker.com:5000"'
++EOF     
++    fi
++
++    local TEMPLATE=/etc/systemd/system/docker.service.d/http-proxy.conf
++    if [ ! -f "${TEMPLATE}" ]; then
++        echo "TEMPLATE: $TEMPLATE"
++        mkdir -p $(dirname $TEMPLATE)
++        cat << EOF > $TEMPLATE
++        [Service]
++        Environment="HTTP_PROXY=http://172.17.0.1:3128"
++EOF     
++    fi
++
++    local TEMPLATE=/etc/hosts
++    echo "TEMPLATE: $TEMPLATE"
++    cat << EOF >> $TEMPLATE
++    #add proxy
++    172.17.0.1 proxy.tdocker.com
++EOF  
++
+ }
+ 
+ function start_addons {
+@@ -987,6 +1015,8 @@ init_flannel
+ systemctl stop update-engine; systemctl mask update-engine
+ 
+ systemctl daemon-reload
++systemctl restart docker
++
+ 
+ if [ $CONTAINER_RUNTIME = "rkt" ]; then
+         systemctl enable load-rkt-stage1
+diff --git a/multi-node/generic/worker-install.sh b/multi-node/generic/worker-install.sh
+index 398cf0f..bc8976f 100644
+--- a/multi-node/generic/worker-install.sh
++++ b/multi-node/generic/worker-install.sh
+@@ -308,6 +308,32 @@ EOF
+ EOF
+     fi
+ 
++    local TEMPLATE=/etc/systemd/system/docker.service.d/50-insecure-registry.conf
++    if [ ! -f "${TEMPLATE}" ]; then
++        echo "TEMPLATE: $TEMPLATE"
++        mkdir -p $(dirname $TEMPLATE)
++        cat << EOF > $TEMPLATE
++        [Service]
++        Environment='DOCKER_OPTS=--registry-mirror="https://proxy.tdocker.com:5000" --insecure-registry="proxy.tdocker.com:5000"'
++EOF     
++    fi
++
++    local TEMPLATE=/etc/systemd/system/docker.service.d/http-proxy.conf
++    if [ ! -f "${TEMPLATE}" ]; then
++        echo "TEMPLATE: $TEMPLATE"
++        mkdir -p $(dirname $TEMPLATE)
++        cat << EOF > $TEMPLATE
++        [Service]
++        Environment="HTTP_PROXY=http://172.17.0.1:3128"
++EOF     
++    fi
++
++    local TEMPLATE=/etc/hosts
++    echo "TEMPLATE: $TEMPLATE"
++    cat << EOF >> $TEMPLATE
++    #add proxy
++    172.17.0.1 proxy.tdocker.com
++EOF  
+ }
+ 
+ init_config
+@@ -318,6 +344,7 @@ chmod +x /opt/bin/host-rkt
+ systemctl stop update-engine; systemctl mask update-engine
+ 
+ systemctl daemon-reload
++systemctl restart docker
+ 
+ if [ $CONTAINER_RUNTIME = "rkt" ]; then
+         systemctl enable load-rkt-stage1
+diff --git a/multi-node/vagrant/etcd-cloud-config.yaml b/multi-node/vagrant/etcd-cloud-config.yaml
+index bc45972..24d6aba 100644
+--- a/multi-node/vagrant/etcd-cloud-config.yaml
++++ b/multi-node/vagrant/etcd-cloud-config.yaml
+@@ -13,6 +13,18 @@ coreos:
+     listen-peer-urls: http://$private_ipv4:2380
+ 
+   units:
++    - name: docker.service
++      drop-ins:
++        - name: 20-http-proxy.conf
++          content: |
++            [Service]
++            Environment="HTTP_PROXY=http://172.17.0.1:3128"
++        - name: 50-insecure-registry.conf
++          content: |
++            [Service]
++             Environment='DOCKER_OPTS=--registry-mirror="https://proxy.tdocker.com:5000" --insecure-registry="proxy.tdocker.com:5000"'
++      command: restart
++    
+ 
+   - name: etcd2.service
+     command: start
