@@ -1,3 +1,0 @@
-PATH="/sbin:/usr/sbin:/bin:/usr/bin"
-
-<%= scope.lookupvar('hadoop::features')["restarts"] -%>	root	service hadoop-resourcemanager restart >/tmp/hadoop-resourcemanager-restart.log 2>&1

@@ -39,7 +39,7 @@ Thumbs.db
 /**/.vagrant/*
 /**/.tmp/*
 /**/.librarian/*
-/**/puppet/modules/*
+/**/puppet/**/modules/*
 *.lock
 *.ruby-version
 parcel-repo

@@ -2,5 +2,5 @@
 
 :sources:
   :base:
-    remote: 'git@github.com:puppetmax/max-com-puppet.git'
+    remote: 'git@github.com:puppetmax/puppet-r10k.git'
     basedir: 'environments'

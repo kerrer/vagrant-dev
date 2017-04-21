@@ -1,21 +1,31 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-#require 'vagrant-vmware-workstation'
-puts ENV
-
-Vagrant.configure("2") do |config|
+Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
-  vpn.vm.network :private_network, ip: "192.168.5.55"
 
-  # r10k plugin to deploy puppet modules
-  config.r10k.puppet_dir = "environments/production"
-  config.r10k.puppetfile_path = "environments/production/Puppetfile"
-  config.r10k.module_path = "environments/production/modules"
+  config.vm.synced_folder "puppet", "/etc/puppet"
 
-  # Provision the machine with the appliction
-  config.vm.provision "puppet" do |puppet|
-    puppet.environment = "production"
-    puppet.environment_path  = "environments"
+  config.vm.synced_folder "openvpn", "/root/openvpn"
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = false
+  end
+  config.vm.provision "shell",
+    inline: "
+        export FACTER_vagrant=1;
+        FQDN=`hostname --fqdn`;
+        mkdir -p /etc/openvpn/keys;
+        
+        puppet apply /etc/puppet/environments/production/manifests/site.pp --confdir=/etc/puppet/ --environment=production --environmentpath=/etc/puppet/environments/
+    "
+
+  config.vm.define "vpn" do |vpn|
+    vpn.vm.hostname = "vpn.techpunch.com"
+    vpn.vm.network :private_network, ip: "192.168.5.10"
+    vpn.vm.network "forwarded_port", guest: 1194, host: 1194
+    vpn.vm.provision :hosts
+  end
+
+  config.vm.define "dummy" do |dummy|
+    dummy.vm.hostname = "dummy.techpunch.com"
+    dummy.vm.network :private_network, ip: "192.168.5.20"
+    dummy.vm.provision :hosts
   end
 end
